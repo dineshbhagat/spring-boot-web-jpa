@@ -1,0 +1,59 @@
+buildscript {
+	ext {
+		springBootVersion = '2.1.0.M3'
+        springBootGradleVersion = '2.0.5.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+        maven { url "https://repository.jboss.org/nexus/content/repositories/releases" }
+    }
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootGradleVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'application'
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+mainClassName = "com.example.DemoApplication"
+
+ext {
+	springBootAdminVersion = '2.0.2'
+}
+
+dependencies {
+	compile "org.springframework.boot:spring-boot-starter-web"
+	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compileOnly('org.projectlombok:lombok')
+
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-jdbc')
+	compile('com.h2database:h2')
+	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
+	compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.12'
+	// https://mvnrepository.com/artifact/com.google.guava/guava
+	compile group: 'com.google.guava', name: 'guava', version: '26.0-jre'
+
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile('de.codecentric:spring-boot-admin-starter-server')
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "de.codecentric:spring-boot-admin-dependencies:${springBootAdminVersion}"
+	}
+}
