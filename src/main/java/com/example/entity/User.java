@@ -21,12 +21,4 @@ public class User implements Serializable {
     @Temporal(TemporalType.DATE)
     @Column(name = "date_of_birth", nullable = true)
     private Date dateOfBirth;
-    /**
-     * CREATE TABLE `user` (
-     *   `id` int(11) NOT NULL,
-     *   `full_name` varchar(45) DEFAULT NULL,
-     *   `date_of_birth` datetime DEFAULT NULL,
-     *   PRIMARY KEY (`id`)
-     * ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-     */
 }
