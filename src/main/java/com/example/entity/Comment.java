@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -23,19 +24,21 @@ public class Comment implements Serializable {
     @Column(name = "created_at")
     private Date postedDate;
 
-    @OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="user_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
     /**
      * We do not make it mandatory, comment still exists even if post is not present
+     *
      * @JoinColumn says that Comment table will contain a separate column article_id
      * which will eventually act as a foreign key reference to primary key of Article table
      * @ManyToOne says that multiple Comment tuples can refer to same Article Tuples(Multiple Comment can be in same Article)
      * Additionally , with optional=false we make sure that no Comment tuple can exist without a Article tuple.
      */
-    @ManyToOne(optional = true)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "article_id")
+    @JsonBackReference
     public Article articleTable;
 
 }
