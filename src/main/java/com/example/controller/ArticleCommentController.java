@@ -41,11 +41,12 @@ public class ArticleCommentController {
     @RequestMapping(value = "/health_check", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Map getDemo() {
         Map<String, String> map = new HashMap<>();
-                map.put("a", "Hello World!");
+        map.put("a", "Hello World!");
         return map;
     }
 
-    /** ideally you should not return article's id as response"
+    /**
+     * ideally you should not return article's id as response"
      *
      * @param articleDto
      * @return
