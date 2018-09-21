@@ -1,26 +1,25 @@
 package com.example;
 
 import com.example.entity.Article;
+import com.example.entity.User;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -31,59 +30,70 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class DemoApplicationTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
-	final static ObjectMapper MAPPER = new ObjectMapper();
+    private EntityManager entityManager;
 
-	static {
-		MAPPER.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
-		MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	}
+    final static ObjectMapper MAPPER = new ObjectMapper();
 
-	@Test
-	public void noParamGetShouldReturnDefaultMessage() throws Exception {
+    static {
+        MAPPER.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+        MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
-		Map<String, String> map = Maps.newHashMap();
-		map.put("a", "Hello World!");
-		String resp = this.mockMvc.perform(get("/abcd")).andDo(print()).andExpect(status().isOk())
-				.andReturn().getResponse().getContentAsString();
-		Assert.assertEquals(MAPPER.writeValueAsString(map), resp);
-	}
+    @PostConstruct
+    private void postConstructBean() {
+        entityManager = entityManagerFactory.createEntityManager();
+    }
 
-	@Test
-	public void paramGreetingShouldReturnTailoredMessage() throws Exception {
+    @Test
+    public void noParamGetShouldReturnDefaultMessage() throws Exception {
 
-		String resp = this.mockMvc.perform(get("/1"))
-				.andDo(print()).andExpect(status().isOk())
+        Map<String, String> map = Maps.newHashMap();
+        map.put("a", "Hello World!");
+        String resp = this.mockMvc.perform(get("/abcd")).andDo(print()).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        Assert.assertEquals(MAPPER.writeValueAsString(map), resp);
+    }
+
+    @Test
+    public void paramGreetingShouldReturnTailoredMessage() throws Exception {
+
+        String resp = this.mockMvc.perform(get("/1"))
+                .andDo(print()).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         System.out.println("hello worlds:" + resp);
 //        Assert.assertEquals(MAPPER.writeValueAsString(map), resp);
-	}
+    }
 
-	@Test
-	public void testHibernate() {
-		SessionFactory sf = entityManagerFactory.unwrap(SessionFactory.class);
-        HibernateTransactionManager transactionManager = new HibernateTransactionManager(sf);
+    @Test
+    public void testHibernate() {
 
-        Session session = sf.openSession();
-		session.beginTransaction();
-
-		Article article = new Article();
-		article.setArticleText("HEllo");
-
-		session.save(article);
-
-		session.getTransaction().commit();
-		//todo this is not working, need to figure out how to do this?, i.e. get result set and iterate over it
-		//List resultSet = session.createQuery("FROM com.example.entity.Article").list();
-       // System.out.println(resultSet);
-		session.close();
-
-
-	}
+        EntityTransaction transaction = entityManager.getTransaction();
+        try {
+            transaction.begin();
+            List<User> users = entityManager.createQuery(
+                    "select p " +
+                            "from User p",
+                    User.class)
+                    .setMaxResults(2)
+                    .getResultList();
+            users.forEach(System.out::println);
+            //todo this is not working, need to figure out how to do this?, i.e. get result set and iterate over it
+            System.out.println("Result------------------");
+            List<Article> articles = entityManager.createNativeQuery("SELECT a.* FROM Article a", Article.class)
+                    .setMaxResults(1).getResultList();
+            articles.forEach(System.out::println);
+            transaction.commit();
+        } catch (Exception e) {
+            System.out.println(e);
+            transaction.rollback();
+        } finally {
+        }
+    }
 
 }
