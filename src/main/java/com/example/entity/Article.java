@@ -2,16 +2,22 @@ package com.example.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "article")
 @Data
-public class Article implements Serializable {
+/**
+ * We are overriding following methods to avoid recursive call between Article.toString() and Comment.toString(), and equals() and hashcode()
+ * Since Article is dependent on List<Comment> and Comment is dependent on Article, so this is recursive-chain call which we have break
+ * so we are not using Article's comment variable in equals, hashcode and toString() method
+ */
+@ToString(exclude = "comments")
+public class Article {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -46,8 +52,7 @@ public class Article implements Serializable {
      * @JsonIgnore is must because: There is cyclic dependency, Article has List<Comment> and Comment has Article ref.
      * Ref: https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
      */
-//    @JsonIgnore
-    @JsonManagedReference
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "articleTable")
     private List<Comment> comments;
 }
