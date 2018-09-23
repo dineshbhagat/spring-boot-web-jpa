@@ -1,11 +1,14 @@
 package com.example;
 
 import com.example.entity.Article;
+import com.example.entity.Comment;
 import com.example.entity.User;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import java.util.List;
 import java.util.Map;
 
@@ -36,8 +39,6 @@ public class DemoApplicationTests {
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
-    private EntityManager entityManager;
-
     final static ObjectMapper MAPPER = new ObjectMapper();
 
     static {
@@ -45,9 +46,9 @@ public class DemoApplicationTests {
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    @PostConstruct
-    private void postConstructBean() {
-        entityManager = entityManagerFactory.createEntityManager();
+    @After
+    public void close() {
+        entityManagerFactory.close();
     }
 
     @Test
@@ -72,7 +73,7 @@ public class DemoApplicationTests {
 
     @Test
     public void testHibernate() {
-
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();
@@ -83,8 +84,13 @@ public class DemoApplicationTests {
                     .setMaxResults(2)
                     .getResultList();
             users.forEach(System.out::println);
-            //todo this is not working, need to figure out how to do this?, i.e. get result set and iterate over it
-            System.out.println("Result------------------");
+            System.out.println("Comment Result------------------");
+            Comment com = entityManager.find(Comment.class, 1L);
+            System.out.println(com);
+            List<Comment> comments = entityManager.createNativeQuery("SELECT a.* FROM Comment a", Comment.class)
+                    .setMaxResults(1).getResultList();
+            comments.forEach(System.out::println);
+            System.out.println("Article Result------------------");
             List<Article> articles = entityManager.createNativeQuery("SELECT a.* FROM Article a", Article.class)
                     .setMaxResults(1).getResultList();
             articles.forEach(System.out::println);
