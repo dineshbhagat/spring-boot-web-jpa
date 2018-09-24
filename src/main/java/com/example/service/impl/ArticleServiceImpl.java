@@ -36,6 +36,6 @@ public class ArticleServiceImpl implements ArticleService {
         if (article.isPresent()) {
             return ArticleConverter.getDto(article.get());
         }
-        throw new Exception("User not found!");
+        throw new Exception("Article not found!");
     }
 }
