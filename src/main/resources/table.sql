@@ -69,3 +69,21 @@ LOCK TABLES `comment` WRITE;
 INSERT INTO `comment` VALUES (1,'This is my first comment to article 1','2018-09-23 00:00:00',1,1);
 INSERT INTO `comment` VALUES (2,'This is my second comment to article 1','2018-09-23 00:00:00',1,1);
 UNLOCK TABLES;
+
+CREATE TABLE `tag` (
+  `tag_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) DEFAULT NULL,
+  `description` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`tag_id`),
+  UNIQUE KEY `id_UNIQUE` (`tag_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+CREATE TABLE `article_tag` (
+  `article_id` int(11) NOT NULL,
+  `tag_id` int(11) NOT NULL,
+  UNIQUE KEY `uq_article_tag` (`article_id`,`tag_id`),
+  KEY `article_id_idx` (`article_id`),
+  KEY `tag_id_idx` (`tag_id`),
+  CONSTRAINT `` FOREIGN KEY (`article_id`) REFERENCES `article` (`id`),
+  CONSTRAINT `tag_id` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tag_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
