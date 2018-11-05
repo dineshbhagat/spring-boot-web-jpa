@@ -14,3 +14,6 @@ The side which doesn't have 'mappedBy' element will be the source (owner) and th
 On the owner side, we can also use @JoinColumn, whose one of the purposes is to specify a foreign key column name instead of relying on the default name.
 
 ---------------------------------------------------------------------------------------------------------------
+![article-eer-diagram](https://user-images.githubusercontent.com/3823705/47979440-34a48880-e0e9-11e8-8c6c-7c7f552d7ad3.png)
+
+----------------------------------------------------------------------------------------------------------------
