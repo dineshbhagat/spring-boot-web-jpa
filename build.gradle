@@ -35,6 +35,7 @@ ext {
 }
 
 dependencies {
+// starters https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-build-systems.html#using-boot-starter
 	compile "org.springframework.boot:spring-boot-starter-web"
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compileOnly('org.projectlombok:lombok')
