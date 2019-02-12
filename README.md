@@ -18,3 +18,25 @@ On the owner side, we can also use `@JoinColumn`, whose one of the purposes is t
 ![article-eer-diagram](https://user-images.githubusercontent.com/3823705/47979440-34a48880-e0e9-11e8-8c6c-7c7f552d7ad3.png)
 
 ----------------------------------------------------------------------------------------------------------------
+If you want to identify number of connections for hikari
+1. Open application in visualVM, attach to application process and check 
+2. Log in application logs/System.out.println
+```java
+MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+            ObjectName poolName = new ObjectName("com.zaxxer.hikari:type=Pool (HikariPool-1)");
+            HikariPoolMXBean poolProxy = JMX.newMXBeanProxy(mBeanServer, poolName, HikariPoolMXBean.class);
+
+            System.out.println("idleConnection before sleep:"+ poolProxy.getIdleConnections());
+            System.out.println("getActiveConnections before sleep:"+ poolProxy.getActiveConnections());
+            System.out.println("getIdleConnections before sleep:"+ poolProxy.getIdleConnections());
+            System.out.println("getThreadsAwaitingConnection before sleep:"+ poolProxy.getThreadsAwaitingConnection());
+            System.out.println("getTotalConnections before sleep:"+ poolProxy.getTotalConnections());
+            Thread.sleep(10000);
+            System.out.println("idleConnection after sleep:"+ poolProxy.getIdleConnections());
+            System.out.println("getActiveConnections after sleep:"+ poolProxy.getActiveConnections());
+            System.out.println("getIdleConnections after sleep:"+ poolProxy.getIdleConnections());
+            System.out.println("getThreadsAwaitingConnection after sleep:"+ poolProxy.getThreadsAwaitingConnection());
+            System.out.println("getTotalConnections after sleep:"+ poolProxy.getTotalConnections());
+```
+
+[Ref](https://github.com/brettwooldridge/HikariCP/wiki/MBean-(JMX)-Monitoring-and-Management)
