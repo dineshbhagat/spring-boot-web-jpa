@@ -1,7 +1,7 @@
 buildscript {
 	ext {
-		springBootVersion = '2.1.0.M3'
-        springBootGradleVersion = '2.0.5.RELEASE'
+		springBootVersion = '2.1.2'
+        springBootGradleVersion = '2.1.2.RELEASE'
 	}
 	repositories {
 		mavenCentral()
@@ -31,7 +31,7 @@ repositories {
 mainClassName = "com.example.DemoApplication"
 
 ext {
-	springBootAdminVersion = '2.0.2'
+	springBootAdminVersion = '2.1.2'
 }
 
 dependencies {
