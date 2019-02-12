@@ -22,7 +22,7 @@ If you want to identify number of connections for hikari
 1. Open application in visualVM, attach to application process and check 
 2. Log in application logs/System.out.println
 ```java
-MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+            MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
             ObjectName poolName = new ObjectName("com.zaxxer.hikari:type=Pool (HikariPool-1)");
             HikariPoolMXBean poolProxy = JMX.newMXBeanProxy(mBeanServer, poolName, HikariPoolMXBean.class);
 
