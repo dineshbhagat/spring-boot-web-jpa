@@ -98,6 +98,13 @@ you can run in detach mode
 8. To Stop container  
    `docker container stop <container-name or container id>`  
 
+
+
+Ref 1. https://springbootdev.com/2017/11/30/docker-spring-boot-and-spring-data-jpa-mysql-rest-api-example-with-docker-without-docker-compose/
+2. https://springbootdev.com/2018/01/09/spring-boot-rest-api-with-docker-with-docker-compose/
+
+
+
 ----------------------------------------------------------------------------------------------------------------
 If you want to identify number of connections for hikari
 1. Open application in visualVM, attach to application process and check 
