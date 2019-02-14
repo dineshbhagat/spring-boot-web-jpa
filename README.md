@@ -19,17 +19,19 @@ On the owner side, we can also use `@JoinColumn`, whose one of the purposes is t
 
 
 ---------------------------------------------------------------------------------------------------------------
-Dockerize your application: 
-If your application has multiple dependencies then there are two way to dockerize you whole application infra
+
+**** Dockerize your application:   
+
+If your application has multiple dependencies then there are two way to dockerize whole application infra viz.  
 1. Create individual images for each components and link them together once containers are up
 2. using docker-compose
 
-following is approach 1.
+Let see approach 1.
 
 Prerequisite:
 Install following docker related software and packages
-- Docker
-- Docker-toolbox 
+- [Docker](https://www.docker.com/products/docker-engine)
+- [Docker-toolbox](https://docs.docker.com/toolbox/) 
 
 
 
