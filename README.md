@@ -44,7 +44,16 @@ Install following docker related software and packages
 
 2. Run mysql image ==> it means create mysql container (lets name it as spring-mysql)
 
-   `docker run --name spring-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -e MYSQL_USER=root -e MYSQL_PASSWORD=root -d mysql/mysql-server:8.0`
+   `docker run --name spring-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -e MYSQL_USER=root -e MYSQL_PASSWORD=root -d mysql/mysql-server:8.0`
+
+
+   By default, when you create a container, it does not publish any of its ports to the outside world.  
+   To make a port available to services outside of Docker, or to Docker containers which are not connected to the container’s network, use the --publish or -p flag.   
+   This creates a firewall rule which maps a container port to a port on the Docker host. Here are some examples
+
+   `-p <docker-host-port>:<Docker-port>`
+   
+   `-p 8080:80/tcp -p 8080:80/udp` //Map TCP port 80 in the container to TCP port 8080 on the Docker host, and map UDP port 80 in the container to UDP port 8080 on the Docker host.  
 
 3. You should get your container in list  
 `docker ps`
