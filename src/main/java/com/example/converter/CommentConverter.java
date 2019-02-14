@@ -11,6 +11,7 @@ public class CommentConverter {
         commentDto.setUserId(comment.getUser().getId());
         commentDto.setArticleId(comment.getArticleTable().getId());
         commentDto.setUser(UserConverter.getDto(comment.getUser()));
+        commentDto.setId(comment.getId());
         return commentDto;
     }
 }
