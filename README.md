@@ -51,29 +51,29 @@ Install following docker related software and packages
    `docker exec -it spring-mysql bash`
    `mysql -uroot -proot`
 
-//execute mysql commands for DB,table creation and insert data  
-[table.sql](src/main/resources/table.sql)
+   //execute mysql commands for DB,table creation and insert data  
+   [table.sql](src/main/resources/table.sql)
 
 5. Build your application image from Dockerfile  
 
-Update [application.properties](src/main/resources/application.properties) file with file at [here](docker/application.properties)  
-Difference between two file is database url
+   Update [application.properties](src/main/resources/application.properties) file with file at [here](docker/application.properties)  
+   Difference between two file is database url
  
-`spring.datasource.url=jdbc:mysql://spring-mysql:3306/test`
-here: spring-mysql is mysql container name
+   `spring.datasource.url=jdbc:mysql://spring-mysql:3306/test`
+   here: spring-mysql is mysql container name
 
 
-Build application  
-`./gradlew clean build`
+   Build application  
+    `./gradlew clean build`
 
-To create image we need to write [`Dockerfile`](Dockerfile)   
+   To create image we need to write [`Dockerfile`](Dockerfile)   
 
 
-Create image file with name :spring-boot-web-jpa  
-   `docker build . -t spring-boot-web-jpa`
+   Create image file with name :spring-boot-web-jpa  
+     `docker build . -t spring-boot-web-jpa`
 
-check images, should show above image  
-`docker images`
+   check images, should show above image  
+     `docker images`
 
 6. if there are existing images or container, stop them or delete them  
    `docker container rm -f spring-boot-web-jpa-mysql spring-mysql && docker container list && docker image rm -f spring-boot-web-jpa && docker images`
