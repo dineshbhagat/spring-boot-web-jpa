@@ -20,7 +20,7 @@ On the owner side, we can also use `@JoinColumn`, whose one of the purposes is t
 
 ---------------------------------------------------------------------------------------------------------------
 
-**** Dockerize your application:   
+#### Dockerize your application:   
 
 If your application has multiple dependencies then there are two way to dockerize whole application infra viz.  
 1. Create individual images for each components and link them together once containers are up
