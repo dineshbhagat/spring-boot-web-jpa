@@ -17,6 +17,46 @@ On the owner side, we can also use `@JoinColumn`, whose one of the purposes is t
 ---------------------------------------------------------------------------------------------------------------
 ![article-eer-diagram](https://user-images.githubusercontent.com/3823705/47979440-34a48880-e0e9-11e8-8c6c-7c7f552d7ad3.png)
 
+
+---------------------------------------------------------------------------------------------------------------
+**** Dockerize your application:
+
+1. get mysql server image  
+`docker pull mysql:8`
+
+   check image list  
+   `docker images -a`
+
+
+2. Run mysql image ==> it means create mysql container (lets name it as spring-mysql)
+
+   `docker run --name spring-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -e MYSQL_USER=root -e MYSQL_PASSWORD=root -d mysql/mysql-server:8.0`
+
+3. You should get your container in list  
+`docker ps`
+
+4. connect to mysql create DB and insert data by connecting to container via shell  
+   `docker exec -it spring-mysql bash`
+   `mysql -uroot -proot`
+
+//execute mysql commands for DB,table creation and insert data  
+[table.sql]()
+
+5. Build your application image from Dockerfile  
+   `docker build . -t spring-boot-web-jpa`
+
+6. if there are existing images or container, stop them or delete them  
+   `docker container rm -f spring-boot-web-jpa-mysql spring-mysql && docker container list && docker image rm -f spring-boot-web-jpa && docker images`
+
+7. link mysql with spring-boot application and create container(name : spring-boot-web-jpa-mysql)  
+   `docker run -p 8080:8080 --name spring-boot-web-jpa-mysql --link spring-mysql:mysql spring-boot-web-jpa`  
+you can run in detach mode  
+   `docker run -p 8080:8080 --name spring-boot-web-jpa-mysql --link spring-mysql:mysql -d spring-boot-web-jpa`
+
+
+8. To Stop container  
+   `docker container stop <container-name or container id>`  
+
 ----------------------------------------------------------------------------------------------------------------
 If you want to identify number of connections for hikari
 1. Open application in visualVM, attach to application process and check 
@@ -40,3 +80,5 @@ If you want to identify number of connections for hikari
 ```
 
 [Ref](https://github.com/brettwooldridge/HikariCP/wiki/MBean-(JMX)-Monitoring-and-Management)
+
+---------------------------------------------------------------------------------------------------------------
