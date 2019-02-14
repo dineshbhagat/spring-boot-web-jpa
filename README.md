@@ -40,7 +40,7 @@ On the owner side, we can also use `@JoinColumn`, whose one of the purposes is t
    `mysql -uroot -proot`
 
 //execute mysql commands for DB,table creation and insert data  
-[table.sql]()
+[table.sql](src/main/resources/table.sql)
 
 5. Build your application image from Dockerfile  
    `docker build . -t spring-boot-web-jpa`
