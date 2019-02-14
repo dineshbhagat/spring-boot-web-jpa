@@ -100,7 +100,8 @@ you can run in detach mode
 
 
 
-Ref 1. https://springbootdev.com/2017/11/30/docker-spring-boot-and-spring-data-jpa-mysql-rest-api-example-with-docker-without-docker-compose/
+Ref:   
+1. https://springbootdev.com/2017/11/30/docker-spring-boot-and-spring-data-jpa-mysql-rest-api-example-with-docker-without-docker-compose/  
 2. https://springbootdev.com/2018/01/09/spring-boot-rest-api-with-docker-with-docker-compose/
 
 
