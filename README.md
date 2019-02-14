@@ -19,7 +19,19 @@ On the owner side, we can also use `@JoinColumn`, whose one of the purposes is t
 
 
 ---------------------------------------------------------------------------------------------------------------
-**** Dockerize your application:
+Dockerize your application: 
+If your application has multiple dependencies then there are two way to dockerize you whole application infra
+1. Create individual images for each components and link them together once containers are up
+2. using docker-compose
+
+following is approach 1.
+
+Prerequisite:
+Install following docker related software and packages
+- Docker
+- Docker-toolbox 
+
+
 
 1. get mysql server image  
 `docker pull mysql:8`
@@ -43,6 +55,11 @@ On the owner side, we can also use `@JoinColumn`, whose one of the purposes is t
 [table.sql](src/main/resources/table.sql)
 
 5. Build your application image from Dockerfile  
+
+You need to write `Dockerfile` for that
+As we have in repo.
+
+Once it is ready you can execute following command
    `docker build . -t spring-boot-web-jpa`
 
 6. if there are existing images or container, stop them or delete them  
