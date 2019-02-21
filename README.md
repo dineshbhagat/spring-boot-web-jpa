@@ -14,6 +14,64 @@ The side which has `'mappedBy'` specified, will be the target entity of the rela
 The side which doesn't have `'mappedBy'` element will be the source (owner) and the corresponding table will be the child of the relationship, i.e. it will have the foreign key column.  
 On the owner side, we can also use `@JoinColumn`, whose one of the purposes is to specify a foreign key column name instead of relying on the default name.  
 
+
+##### @ManyToMany
+
+1. One article can have multiple tags: e.g. java, hibernate, jpa etc.    
+   one tag can be a part of multiple Articles  
+   This is manyTomany relationship.  
+   Annotate variables in both entity class with @ManyToMany
+
+   ```java
+   @Entity
+   @Table(name = "article")
+   @Data
+   public class Article {
+      ...
+      @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Lazy loading of records
+      private Set<Tag> tags;
+      ...
+   }
+   ```
+
+
+   ```java
+   @Entity
+   @Table(name = "tag")
+   @Data
+   public class Tag {
+      ...
+      @ManyToMany(mappedBy = "tags") // tags is instance variable in Article entity 
+      private Set<Article> articles;
+      ...
+   }
+   ```
+
+2. Now to achive this we need to map relationship among Tags and Articles,  
+   So we need an extra table where we will store the relationship  
+   Let say table: `article_tag`, it has primary key of both article and tag table  
+
+   ```sql
+   CREATE TABLE `article_tag` (
+      `article_id` int(11) NOT NULL,
+      `tag_id` int(11) NOT NULL,
+      UNIQUE KEY `uq_article_tag` (`article_id`,`tag_id`),
+      KEY `article_id_idx` (`article_id`),
+      KEY `tag_id_idx` (`tag_id`),
+      CONSTRAINT `` FOREIGN KEY (`article_id`) REFERENCES `article` (`id`),
+      CONSTRAINT `tag_id` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tag_id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+   ```
+
+3. Lets use this table as joining table for two entities Tags and Article
+   So Let's annotate it with @JoinTable,  
+   but which field? `Article.tags` or `Tag.articles`  
+   To answer that we need to understand owning side and reverse side
+   
+
+
+Ref: https://www.baeldung.com/hibernate-many-to-many
+
 ---------------------------------------------------------------------------------------------------------------
 ![article-eer-diagram](https://user-images.githubusercontent.com/3823705/47979440-34a48880-e0e9-11e8-8c6c-7c7f552d7ad3.png)
 
