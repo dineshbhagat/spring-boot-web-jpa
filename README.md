@@ -1,14 +1,17 @@
-# spring-boot-web-jpa
+## spring-boot-web-jpa
 ---------------------------------------------------------------------------------------------------------------
-Using Java-8
 
-Ref: https://www.logicbig.com/tutorials/java-ee-tutorial/jpa/one-to-many-bidirectional.html
+Using Java-8, Spring-boot, mysql, Docker
 
-https://stackoverflow.com/q/12493865/2987755
-
+---------------------------------------------------------------------------------------------------------------
 
 
-ORM to OOPs mapping by some of the following terms:
+ORM to OOPs mapping need understanding of the following terms:  
+Bidirectional, unidirectional, ownedBy,mappedBy, inversedBy, oneToOne, oneToMany, manyToMany, joinColumn,inverseJoinColumns, joinTable,
+
+- Relationships may be bidirectional or unidirectional.
+- A bidirectional relationship has both an owning side and an inverse side
+- A unidirectional relationship only has an owning side.
 
 In bidirectional *one-to-many/many-to-one* relationship, the target side has a reference back to the source entity as well. 
 
@@ -126,7 +129,10 @@ Ths same issue will persist if application tries to print entities which intern 
    ```
 
 
-Ref: https://www.baeldung.com/hibernate-many-to-many
+Ref: 
+- https://www.baeldung.com/hibernate-many-to-many  
+- https://www.logicbig.com/tutorials/java-ee-tutorial/jpa/one-to-many-bidirectional.html  
+- https://stackoverflow.com/q/12493865/2987755  
 
 ---------------------------------------------------------------------------------------------------------------
 ![article-eer-diagram](https://user-images.githubusercontent.com/3823705/47979440-34a48880-e0e9-11e8-8c6c-7c7f552d7ad3.png)
