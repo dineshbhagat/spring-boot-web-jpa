@@ -4,22 +4,39 @@ Using Java-8
 
 Ref: https://www.logicbig.com/tutorials/java-ee-tutorial/jpa/one-to-many-bidirectional.html
 
-In bidirectional *one-to-many/many-to-one* relationship, the target side has a reference back to the source entity as well.  
-The annotation `@OneToMany` is used on the side which has the collection reference.  
-The annotation `@ManyToOne` is used on the side which has the single-valued back reference.  
+https://stackoverflow.com/q/12493865/2987755
+
+
+
+ORM to OOPs mapping by some of the following terms:
+
+In bidirectional *one-to-many/many-to-one* relationship, the target side has a reference back to the source entity as well. 
+
+The owning side of a `@OneToOne` assocation is the entity with the table containing the foreign key.
+
+The annotation `@OneToMany` is used on the side which has the collection reference(always the inverse side of a bidirectional assocation)  
+The annotation `@ManyToOne` is used on the side which has the single-valued back reference(always the owning side of a bidirectional assocation)  
 We must use `'mappedBy'` element of the `@OneToMany` annotations to specify that the corresponding table will be the parent table.  
 In other words the other side (which has `@ManyToOne`) will be the foreign-key table (child table).  
 The value of `'mappedBy'` element should be the name of the reference variable used in the other class's back reference.  
-The side which has `'mappedBy'` specified, will be the target entity of the relationship and corresponding table will be the parent of the relationship.  
+The side which has `'mappedBy'` specified, will be the target entity of the relationship and corresponding table will be the parent of the relationship(has to be specified on the inversed side of a (bidirectional) association)   
 The side which doesn't have `'mappedBy'` element will be the source (owner) and the corresponding table will be the child of the relationship, i.e. it will have the foreign key column.  
 On the owner side, we can also use `@JoinColumn`, whose one of the purposes is to specify a foreign key column name instead of relying on the default name.  
+`inversedBy` has to be specified on the owning side of a (bidirectional) association.  
 
 
 ##### @ManyToMany
 
 1. One article can have multiple tags: e.g. java, hibernate, jpa etc.    
-   one tag can be a part of multiple Articles  
-   This is manyTomany relationship.  
+   one tag can be a part of multiple Articles   
+   For Many-To-Many associations you can chose which entity is the owning and which the inverse side.  
+   There is a very simple semantic rule to decide which side is more suitable to be the owning side from a developers perspective.  
+   You only have to ask yourself, which entity is responsible for the connection management and pick that as the owning side.  
+   Take an example of two entities Article and Tag.  
+   Whenever you want to connect an Article to a Tag and vice-versa, it is mostly the Article that is responsible for this relation.  
+   Whenever you add a new article, you want to connect it with existing or new tags.  
+   Your create Article form will probably support this notion and allow to specify the tags directly.  
+   This is why you should pick the Article as owning side, as it makes the code more understandable:  
    Annotate variables in both entity class with @ManyToMany
 
    ```java
@@ -66,8 +83,47 @@ On the owner side, we can also use `@JoinColumn`, whose one of the purposes is t
 3. Lets use this table as joining table for two entities Tags and Article
    So Let's annotate it with @JoinTable,  
    but which field? `Article.tags` or `Tag.articles`  
-   To answer that we need to understand owning side and reverse side
+   To answer that we need to understand [owning side and reverse side](https://stackoverflow.com/q/2749689/2987755)
+   Since owning side is Article, Lets define `@JoinTable` on Article entity.
    
+      ```java
+      @Entity
+      @Table(name = "article")
+      @Data
+      public class Article {
+         ...
+         @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Lazy loading of records
+         @JoinTable(
+            name = "article_tag",
+            joinColumns = {@JoinColumn(name = "article_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id")}
+         )
+         private Set<Tag> tags;
+         ...
+      }
+   ```
+4. But This will introduce circular dependency for Jackson when it serialize/deserialize because Article depends on tag and tag intern depends on article so we will get stackoverflow error.  
+To break this we need to ignore property from one of the entity by annotating it with `@JsonIgnore`.  
+Ths same issue will persist if application tries to print entities which intern will call ToString methods and again circular dependency so to break this we need to annotate it with `@ToString.Exclude`
+
+      ```java
+      @Entity
+      @Table(name = "article")
+      @Data
+      public class Article {
+         ...
+         @JsonIgnore
+         @ToString.Exclude
+         @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Lazy loading of records
+         @JoinTable(
+            name = "article_tag",
+            joinColumns = {@JoinColumn(name = "article_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id")}
+         )
+         private Set<Tag> tags;
+         ...
+      }
+   ```
 
 
 Ref: https://www.baeldung.com/hibernate-many-to-many
