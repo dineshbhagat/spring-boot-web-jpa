@@ -21,16 +21,9 @@ import java.util.Set;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureMockMvc
 public class JPAEntityLevelTests {
     @Autowired
     private EntityManagerFactory entityManagerFactory;
-
-
-    @After
-    public void close() {
-        entityManagerFactory.close();
-    }
 
     @Test
     public void testHibernate() {
