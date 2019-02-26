@@ -28,7 +28,7 @@ public class JPAEntityLevelTests2 {
 
     @Test
     @Transactional
-    public void testByTitle() {
+    public void testByArticleId() {
         Optional<Article> articleOptional = articleDao.findById(1L);
         if (articleOptional.isPresent()) {
             Article article = articleOptional.get();
