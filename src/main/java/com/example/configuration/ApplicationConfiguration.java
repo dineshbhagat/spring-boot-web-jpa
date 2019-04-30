@@ -3,11 +3,10 @@ package com.example.configuration;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-
-import javax.persistence.EntityManagerFactory;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootConfiguration
 public class ApplicationConfiguration {
@@ -20,4 +19,9 @@ public class ApplicationConfiguration {
         return MAPPER;
     }
 
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        // Do any additional configuration here
+        return builder.build();
+    }
 }
