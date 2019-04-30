@@ -1,7 +1,8 @@
 buildscript {
 	ext {
-		springBootVersion = '2.1.2'
-        springBootGradleVersion = '2.1.2.RELEASE'
+		springBootVersion = '2.1.4'
+		springBootAdminVersion = '2.1.4'
+        	springBootGradleVersion = '2.1.4.RELEASE'
 	}
 	repositories {
 		mavenCentral()
@@ -30,10 +31,6 @@ repositories {
 
 mainClassName = "com.example.DemoApplication"
 
-ext {
-	springBootAdminVersion = '2.1.2'
-}
-
 dependencies {
 // starters https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-build-systems.html#using-boot-starter
 	compile "org.springframework.boot:spring-boot-starter-web"
@@ -44,9 +41,9 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-jdbc')
 	compile('com.h2database:h2')
 	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
-	compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.12'
+	compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.15'
 	// https://mvnrepository.com/artifact/com.google.guava/guava
-	compile group: 'com.google.guava', name: 'guava', version: '26.0-jre'
+	compile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
 
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
