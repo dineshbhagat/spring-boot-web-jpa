@@ -29,6 +29,7 @@ repositories {
 	mavenCentral()
 }
 
+applicationName="spring-boot-web-jpa"
 mainClassName = "com.example.DemoApplication"
 
 dependencies {
