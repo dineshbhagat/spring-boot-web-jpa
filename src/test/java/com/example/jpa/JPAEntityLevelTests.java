@@ -92,7 +92,7 @@ public class JPAEntityLevelTests {
         article.forEach(System.out::println);
     }
     
-        @Test
+        //@Test
     public void testCreateNodetype() {
         Nodetypes nodetypes = new Nodetypes();
         nodetypes.setId(1);
