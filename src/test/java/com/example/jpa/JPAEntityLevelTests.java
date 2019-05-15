@@ -25,6 +25,12 @@ public class JPAEntityLevelTests {
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
+    @Autowired
+    NodetypesRepository nodetypesRepository;
+
+    @Autowired
+    NodesRepository nodesRepository;
+    
     @Test
     public void testHibernate() {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -84,5 +90,30 @@ public class JPAEntityLevelTests {
 
         List<Article> article = entityManager.createQuery("From Article").getResultList();
         article.forEach(System.out::println);
+    }
+    
+        @Test
+    public void testCreateNodetype() {
+        Nodetypes nodetypes = new Nodetypes();
+        nodetypes.setId(1);
+        nodetypes.setLabel("myLabel");
+        nodetypes.setName("44");
+        nodetypes.setIs_group(true);
+        nodetypes.setCreated_at(new java.util.Date());
+
+        nodetypesRepository.save(nodetypes);
+    }
+
+    @Test
+    public void testCreateNodes() {
+        testCreateNodetype();
+        Nodetypes nodetype = nodetypesRepository.findById(1).get();
+        Nodes node1 = new Nodes();
+        node1.setCreated_at(new java.util.Date());
+        node1.setName("nodeName");
+        node1.setNode_id(444);
+        node1.setNodetypes(nodetype);
+
+        nodesRepository.save(node1);
     }
 }
