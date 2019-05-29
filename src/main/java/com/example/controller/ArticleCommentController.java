@@ -83,5 +83,13 @@ public class ArticleCommentController {
         return articleService.getArticle(articleId);
     }
 
+    @RequestMapping(value = "/56347092/2987755", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Article> getAnswer() throws Exception {
+        CompletableFuture<List<Article>> completableFuture = articleService.getAnswerForSO();
+        System.out.println("At controller");
+        List<Article> result = completableFuture.get();
+        return result;
+    }
+
 }
 
