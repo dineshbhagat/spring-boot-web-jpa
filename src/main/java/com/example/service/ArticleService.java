@@ -7,4 +7,6 @@ public interface ArticleService {
     Article addArticle(ArticleDto articleDto);
 
     ArticleDto getArticle(String articleId) throws Exception;
+    
+    CompletableFuture<List<Article>> getAnswerForSO();
 }
