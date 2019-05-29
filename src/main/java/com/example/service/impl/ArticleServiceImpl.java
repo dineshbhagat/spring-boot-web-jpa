@@ -38,4 +38,38 @@ public class ArticleServiceImpl implements ArticleService {
         }
         throw new Exception("Article not found!");
     }
+    
+    @Override
+    public CompletableFuture<List<Article>> getAnswerForSO() {
+
+        System.out.println("In DAO");
+
+        CompletableFuture<List<Article>> completableFuture
+                = new CompletableFuture<>();
+        ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(2);
+        threadPoolExecutor.submit(() -> {
+            Thread.sleep(500);
+            System.out.println("Before DAO");
+            List<Article> article = articleDao.findAll();
+            System.out.println("After DAO");
+            return completableFuture.complete(article);
+        });
+
+        CompletableFuture.supplyAsync(() -> {
+            System.out.println("Testing My DB Connection");
+            return this.testConnection();
+        }, threadPoolExecutor).thenAccept(val -> {
+            if(val) {
+                System.out.println("My DB Connection Test SUCCESS");
+            } else {
+                throw new RuntimeException("CONNECTION TO MY DB FAILED");
+            }
+        }).join();
+
+        return completableFuture;
+    }
+
+    private boolean testConnection() {
+        return true;
+    }
 }
