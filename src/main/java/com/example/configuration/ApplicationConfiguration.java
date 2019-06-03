@@ -16,6 +16,15 @@ public class ApplicationConfiguration {
         final ObjectMapper MAPPER = new ObjectMapper();
         MAPPER.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        /* 
+        //If you need date in ISO8601 format in json serialization/deserialization, do following changes
+        //JavaTimeModule javaTimeModule = new JavaTimeModule();
+        //MAPPER.registerModule(javaTimeModule);
+        //MAPPER.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+        */
+        /* JsonView related switch
+        MAPPER.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
+        */
         return MAPPER;
     }
 
