@@ -26,6 +26,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
+        mavenLocal()
 	mavenCentral()
 }
 
@@ -54,5 +55,35 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom "de.codecentric:spring-boot-admin-dependencies:${springBootAdminVersion}"
+	}
+}
+
+// for local publishing of jar to .m2 folder, to refer this jar by another local project
+// make sure  mavenLocal() is first in repositories list as shown above
+// Ref: https://docs.gradle.org/current/userguide/publishing_maven.html
+
+sourceSets{
+	main{
+		java.srcDir file('src/main/java')
+		resources.srcDir file('src/main/resources')
+	}
+	test{
+		java.srcDir file('src/test/java')
+		resources.srcDir file('src/test/resources')
+	}
+}
+
+apply plugin: 'maven-publish'
+task sourcesJar(type: Jar) {
+	from sourceSets.main.allJava
+	archiveClassifier = 'sources'
+}
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			version = '0.0.1'
+			from components.java
+			artifact sourcesJar
+		}
 	}
 }
