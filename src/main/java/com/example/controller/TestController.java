@@ -7,6 +7,9 @@ import lombok.Data;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+Ref: https://lankydan.dev/2017/03/11/passing-data-transfer-objects-with-get-in-spring-boot
+*/
 @RestController
 public class TestController {
 
