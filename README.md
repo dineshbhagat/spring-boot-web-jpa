@@ -291,5 +291,13 @@ execute following command
 ./gradlew publishToMavenLocal
 ```
 
+To refer to localjars,   
+make sure you have added `mavenLocal` in repository url
+
+```java
+repositories {
+  mavenLocal()
+}
+```
 ------
 
