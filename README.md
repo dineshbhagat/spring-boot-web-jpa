@@ -2,7 +2,7 @@
 	- [ORM to OOPs mapping](#orm-to-oops-mapping)
 		- [@ManyToMany](#manytomany)
 	- [Dockerize your application:](#dockerize-your-application)
-	- [Hikari configuration](#hikari-configuration)
+	- [Check Hikari configuration](#Check-hikari-configuration)
 	- [Publishing local jars](#publishing-local-jars)
 
 ------
@@ -238,7 +238,7 @@ Ref:
 
 ----------------------------------------------------------------------------------------------------------------
 
-#### Hikari configuration
+#### Check Hikari configuration
 
 If you want to identify number of connections for hikari
 1. Open application in visualVM, attach to application process and check 
