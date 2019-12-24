@@ -81,7 +81,9 @@ task sourcesJar(type: Jar) {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			version = '0.0.1'
+		// Adding following version manually for local release
+		// Artifact will be generated at /Users/$USER/.m2/repository/<package>/*.jar
+			version = '0.0.1.x.snapshot'
 			from components.java
 			artifact sourcesJar
 		}
