@@ -251,3 +251,29 @@ If you want to identify number of connections for hikari
 [Ref](https://github.com/brettwooldridge/HikariCP/wiki/MBean-(JMX)-Monitoring-and-Management)
 
 ---------------------------------------------------------------------------------------------------------------
+To publish jar locally, add follwoing in build.gradle file and 
+
+```java
+ for local publishing jar to .m2 folder, uncomment following
+apply plugin: 'maven-publish'
+task sourcesJar(type: Jar) {
+	from sourceSets.main.allJava
+	archiveClassifier = 'sources'
+}
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			version = '1.x.snapshot'
+			from components.java
+			artifact sourcesJar
+		}
+	}
+}
+```
+execute following command
+
+```bash
+./gradlew publishToMavenLocal
+```
+
+
