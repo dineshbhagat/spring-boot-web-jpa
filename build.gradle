@@ -5,8 +5,12 @@ buildscript {
         	springBootGradleVersion = '2.1.4.RELEASE'
 	}
 	repositories {
+	        mavenLocal()
 		mavenCentral()
-        maven { url "https://repository.jboss.org/nexus/content/repositories/releases" }
+		jcenter()
+		maven { url 'http://repo.spring.io/plugins-release' }
+		maven { url "https://repo.spring.io/libs-release" }
+                maven { url "https://repository.jboss.org/nexus/content/repositories/releases" }
     }
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootGradleVersion}")
@@ -28,6 +32,9 @@ targetCompatibility = 1.8
 repositories {
         mavenLocal()
 	mavenCentral()
+	jcenter()
+	maven { url "http://repo.spring.io/libs-release" }
+        maven { url "https://plugins.gradle.org/m2/" }
 }
 
 applicationName="spring-boot-web-jpa"
