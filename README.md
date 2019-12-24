@@ -270,7 +270,6 @@ If you want to identify number of connections for hikari
 To publish jar locally, add follwoing in build.gradle file and 
 
 ```java
- for local publishing jar to .m2 folder, uncomment following
 apply plugin: 'maven-publish'
 task sourcesJar(type: Jar) {
 	from sourceSets.main.allJava
