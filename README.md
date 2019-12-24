@@ -1,3 +1,12 @@
+- [spring-boot-web-jpa](#spring-boot-web-jpa)
+	- [ORM to OOPs mapping](#orm-to-oops-mapping)
+		- [@ManyToMany](#manytomany)
+	- [Dockerize your application:](#dockerize-your-application)
+	- [Hikari configuration](#hikari-configuration)
+	- [Publishing local jars](#publishing-local-jars)
+
+------
+
 ## spring-boot-web-jpa
 ---------------------------------------------------------------------------------------------------------------
 
@@ -5,6 +14,7 @@ Using Java-8, Spring-boot, mysql, Docker, [2-level-hibernate-cache](https://gith
 
 ---------------------------------------------------------------------------------------------------------------
 
+### ORM to OOPs mapping
 
 ORM to OOPs mapping need understanding of the following terms:  
 Bidirectional, unidirectional, ownedBy,mappedBy, inversedBy, oneToOne, oneToMany, manyToMany, joinColumn,inverseJoinColumns, joinTable,
@@ -15,10 +25,10 @@ Bidirectional, unidirectional, ownedBy,mappedBy, inversedBy, oneToOne, oneToMany
 
 In bidirectional *one-to-many/many-to-one* relationship, the target side has a reference back to the source entity as well. 
 
-The owning side of a `@OneToOne` assocation is the entity with the table containing the foreign key.
+The owning side of a `@OneToOne` association is the entity with the table containing the foreign key.
 
-The annotation `@OneToMany` is used on the side which has the collection reference(always the inverse side of a bidirectional assocation)  
-The annotation `@ManyToOne` is used on the side which has the single-valued back reference(always the owning side of a bidirectional assocation)  
+The annotation `@OneToMany` is used on the side which has the collection reference(always the inverse side of a bidirectional association)  
+The annotation `@ManyToOne` is used on the side which has the single-valued back reference(always the owning side of a bidirectional association)  
 We must use `'mappedBy'` element of the `@OneToMany` annotations to specify that the corresponding table will be the parent table.  
 In other words the other side (which has `@ManyToOne`) will be the foreign-key table (child table).  
 The value of `'mappedBy'` element should be the name of the `reference variable` used in the other class's back reference.  
@@ -227,6 +237,9 @@ Ref:
 
 
 ----------------------------------------------------------------------------------------------------------------
+
+#### Hikari configuration
+
 If you want to identify number of connections for hikari
 1. Open application in visualVM, attach to application process and check 
 2. Log in application logs/System.out.println
@@ -251,6 +264,9 @@ If you want to identify number of connections for hikari
 [Ref](https://github.com/brettwooldridge/HikariCP/wiki/MBean-(JMX)-Monitoring-and-Management)
 
 ---------------------------------------------------------------------------------------------------------------
+
+#### Publishing local jars
+
 To publish jar locally, add follwoing in build.gradle file and 
 
 ```java
@@ -276,4 +292,5 @@ execute following command
 ./gradlew publishToMavenLocal
 ```
 
+------
 
