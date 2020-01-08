@@ -80,6 +80,8 @@ sourceSets{
 	}
 }
 
+// command to publish local artifect
+// $ ./gradlew publishToMavenLocal
 apply plugin: 'maven-publish'
 task sourcesJar(type: Jar) {
 	from sourceSets.main.allJava
