@@ -1,4 +1,4 @@
-package com.dkb.jsonviews;
+package com.example.notepad.jsonviews;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
