@@ -267,7 +267,7 @@ If you want to identify number of connections for hikari
 
 #### Publishing local jars
 
-To publish jar locally, add follwoing in build.gradle file and 
+To publish jar locally, add following in build.gradle file and 
 
 ```java
 apply plugin: 'maven-publish'
@@ -299,5 +299,8 @@ repositories {
   mavenLocal()
 }
 ```
+Artifact will be at 
+`/Users/$USER/.m2/repository/<package>/*.jar` for mac
+
 ------
 
