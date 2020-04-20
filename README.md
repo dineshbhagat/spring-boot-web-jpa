@@ -275,12 +275,17 @@ task sourcesJar(type: Jar) {
 	from sourceSets.main.allJava
 	archiveClassifier = 'sources'
 }
+task javadocJar(type: Jar) {
+    archiveClassifier = 'javadoc'
+    from javadoc.destinationDir
+}
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			version = '1.x.snapshot'
 			from components.java
 			artifact sourcesJar
+			artifact javadocJar
 		}
 	}
 }
