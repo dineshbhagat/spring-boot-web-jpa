@@ -82,6 +82,8 @@ sourceSets{
 
 // command to publish local artifect
 // $ ./gradlew publishToMavenLocal
+// commenting this to make github action happy
+/*
 apply plugin: 'maven-publish'
 task sourcesJar(type: Jar) {
 	from sourceSets.main.allJava
@@ -102,4 +104,4 @@ publishing {
 			artifact javadocJar
 		}
 	}
-}
+}*/
