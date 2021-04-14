@@ -309,3 +309,6 @@ Artifact will be at
 
 ------
 
+
+[![HitCount](http://hits.dwyl.com/dineshbhagat/spring-boot-web-jpa.svg)](http://hits.dwyl.com/dineshbhagat/spring-boot-web-jpa)
+
