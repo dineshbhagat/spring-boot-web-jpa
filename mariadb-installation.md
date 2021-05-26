@@ -1,4 +1,4 @@
-#### for mac osx
+### for mac osx
 
 #### Fresh mariadb installation and do not have mysql installed on machine
 
