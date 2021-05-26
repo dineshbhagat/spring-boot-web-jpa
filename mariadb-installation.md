@@ -6,7 +6,7 @@
 brew install mariadb
 ```
 
-provide password for root user.
+ Set password for root user
 
 ```
 sudo /usr/local/bin/mariadb-secure-installation
@@ -33,7 +33,11 @@ MariaDB [mysql]> select User, plugin from user;
 
 5 rows in set (0.001 sec)
 
-#### Fresh installation with existing mysql on machine
+#### Fresh mariadb installation with existing mysql on machine
 
 [Ref](https://stackoverflow.com/a/54368020/2987755) 
 
+- remove existing mysql installation
+- unlink all binaries
+- install mariadb
+- follow steps mention above for `Set password for root user`
