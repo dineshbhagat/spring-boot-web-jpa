@@ -33,6 +33,11 @@ MariaDB [mysql]> select User, plugin from user;
 
 5 rows in set (0.001 sec)
 
+##### If you do not want to give password for root user then
+- login to mysql shell with priviledge `sudo mysql -u root`
+- create your database `CREATE DATABASE yourdb;`
+- grant and flush priviledge `GRANT ALL ON yourdb.* TO yournewuser@localhost IDENTIFIED BY 'yourpassword';` , `FLUSH privileges;`
+
 #### Fresh mariadb installation with existing mysql on machine
 
 [Ref](https://stackoverflow.com/a/54368020/2987755) 
