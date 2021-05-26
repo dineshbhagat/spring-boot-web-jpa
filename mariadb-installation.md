@@ -11,7 +11,7 @@ provide password for root user.
 ```
 sudo /usr/local/bin/mariadb-secure-installation
 ```
-Do not select unix plugin password type
+Do not select `Switch to unix_socket authentication`
 
 
 restart mariadb.
