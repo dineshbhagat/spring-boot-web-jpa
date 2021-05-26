@@ -46,3 +46,18 @@ MariaDB [mysql]> select User, plugin from user;
 - unlink all binaries
 - install mariadb
 - follow steps mention above for `Set password for root user`
+
+##### Add new user
+
+```
+mysql -u root -p -h localhost
+# enter password if already set
+```
+
+```
+MariaDB [(none)]> use mysql;
+MariaDB [(none)]> show user;
+MariaDB [mysql]> show tables;
+MariaDB [mysql]> create user nonroot;
+MariaDB [mysql]> \q
+```
