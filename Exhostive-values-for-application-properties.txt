@@ -31,6 +31,9 @@ info.app.java.target=@java.version@
 # ===============================
 debug=false
 logging.level.root=INFO
+# this helps to get real insight into what security is doing to your application
+logging.level.org.springframework.security=TRACE
+
 # ===============================
 # = EMBEDDED SERVER CONFIGURATION (ServerProperties)
 # ===============================
