@@ -316,4 +316,5 @@ Artifact will be at
 
 Some of the useful resources and Q&A
 - https://github.com/simasch/spring-data-jpa-tests
+- [Efficiently adding to persistent collections](https://in.relation.to/2024/11/07/adding-to-collections/)
 
