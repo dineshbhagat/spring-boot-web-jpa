@@ -78,6 +78,8 @@ public class Article {
      * <p>
      * The mappedBy attribute is used in the @ManyToMany annotation to indicate that
      * the Articles collection is mapped by the tags collection of the owner side.
+     * Did you noticed we are using Set<Tag> and not List<Tag> ? -> Reason is hibernate mapping creates an issue if we try to remove one associated tag to this article
+     * for e.g. if we remove one tag, hibernate would delete all the tags and re-inserts N-1 tags which causes the performance degradations. 
      */
     @JsonIgnore
     @ToString.Exclude
