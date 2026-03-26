@@ -50,6 +50,7 @@ dependencies {
     testImplementation libs.spring.boot.starter.test
     testImplementation libs.spring.boot.webmvc.test
     testImplementation libs.spring.boot.restclient.test
+    testImplementation libs.spring.boot.resttestclient
 }
 
 tasks.named('test') {

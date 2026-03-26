@@ -13,6 +13,7 @@ spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 spring-boot-webmvc-test = { module = "org.springframework.boot:spring-boot-webmvc-test" }
 spring-boot-restclient-test = { module = "org.springframework.boot:spring-boot-restclient-test" }
+spring-boot-resttestclient = { module = "org.springframework.boot:spring-boot-resttestclient" }
 spring-boot-admin-starter-server = { module = "de.codecentric:spring-boot-admin-starter-server", version.ref = "spring-boot-admin" }
 h2 = { module = "com.h2database:h2" }
 postgresql = { module = "org.postgresql:postgresql" }
