@@ -1,25 +1,24 @@
 package com.example.jpa;
 
+import com.example.dao.NodesRepository;
+import com.example.dao.NodetypesRepository;
 import com.example.entity.Article;
 import com.example.entity.Comment;
+import com.example.entity.Nodes;
+import com.example.entity.Nodetypes;
 import com.example.entity.Tag;
 import com.example.entity.User;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import java.util.List;
 import java.util.Set;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 public class JPAEntityLevelTests {
     @Autowired
@@ -93,21 +92,20 @@ public class JPAEntityLevelTests {
     }
     
         //@Test
-    public void testCreateNodetype() {
+    public Nodetypes testCreateNodetype() {
         Nodetypes nodetypes = new Nodetypes();
-        nodetypes.setId(1);
         nodetypes.setLabel("myLabel");
         nodetypes.setName("44");
         nodetypes.setIs_group(true);
         nodetypes.setCreated_at(new java.util.Date());
 
-        nodetypesRepository.save(nodetypes);
+        return nodetypesRepository.save(nodetypes);
     }
 
     @Test
     public void testCreateNodes() {
-        testCreateNodetype();
-        Nodetypes nodetype = nodetypesRepository.findById(1).get();
+        Nodetypes savedNodetype = testCreateNodetype();
+        Nodetypes nodetype = nodetypesRepository.findById(savedNodetype.getId()).get();
         Nodes node1 = new Nodes();
         node1.setCreated_at(new java.util.Date());
         node1.setName("nodeName");

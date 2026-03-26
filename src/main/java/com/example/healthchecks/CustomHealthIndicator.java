@@ -1,7 +1,9 @@
+package com.example.healthchecks;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
-import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.health.contributor.AbstractHealthIndicator;
+import org.springframework.boot.health.contributor.Health;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -11,7 +13,7 @@ Uncomment following line if you want following class to run
 //@Component
 public class CustomHealthIndicator extends AbstractHealthIndicator {
 
-    private static final Logger logger = LoggerFactory.getLogger(HealthIndicator.class);
+    private static final Logger logger = LoggerFactory.getLogger(CustomHealthIndicator.class);
 
     @Override
     protected void doHealthCheck(Health.Builder builder) throws Exception {

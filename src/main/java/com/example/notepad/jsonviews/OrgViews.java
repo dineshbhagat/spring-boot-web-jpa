@@ -1,10 +1,11 @@
 package com.example.notepad.jsonviews;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectReader;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -29,23 +30,25 @@ public class OrgViews {
         static final Map<Views, ObjectWriter> objectWriterMap = new HashMap<>();
         static final Map<Views, ObjectReader> objectReaderMap = new HashMap<>();
         static {
-            final ObjectMapper objectWriter = new ObjectMapper();
-            objectWriter.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
+            final ObjectMapper objectWriter = JsonMapper.builder()
+                    .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
+                    .build();
             objectWriterMap.put(Views.PUBLIC, objectWriter.writerWithView(OrgViews.Public.class));
             objectWriterMap.put(Views.INTERNAL, objectWriter.writerWithView(OrgViews.Internal.class));
             objectWriterMap.put(Views.PERSONAL, objectWriter.writerWithView(OrgViews.Personal.class));
         }
 
         static {
-            final ObjectMapper objectReader = new ObjectMapper();
-            objectReader.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
+            final ObjectMapper objectReader = JsonMapper.builder()
+                    .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
+                    .build();
             objectReaderMap.put(Views.PUBLIC, objectReader.readerWithView(OrgViews.Public.class));
             objectReaderMap.put(Views.INTERNAL, objectReader.readerWithView(OrgViews.Internal.class));
             objectReaderMap.put(Views.PERSONAL, objectReader.readerWithView(OrgViews.Personal.class));
         }
     }
 
-    public static String serialize(Object object, Views views) throws JsonProcessingException {
+    public static String serialize(Object object, Views views) throws JacksonException {
         ObjectWriter objectWriter = Helper.objectWriterMap.get(views);
         if (objectWriter != null) {
             return objectWriter.writeValueAsString(object);

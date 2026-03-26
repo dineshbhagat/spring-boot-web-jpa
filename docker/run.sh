@@ -1,9 +1,11 @@
-#! /bin/bash -e
+#!/bin/sh
+set -e
 
-echo "Starting Spring application ...."
-#JAVA_OPTS in java is not working
-#export JAVA_OPTS="-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Xms1024m -Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version -Dspring.config.location=/opt/mydemo/application.properties"
+echo "Starting Spring Boot application..."
 
-cat /opt/mydemo/application.properties
-
-java -jar /opt/mydemo/demo-*.jar
+exec java \
+    -XX:MaxRAMPercentage=75.0 \
+    -XX:+UseZGC \
+    ${JAVA_OPTS:-} \
+    -jar /opt/app/app.jar \
+    --spring.config.location=optional:classpath:/application.properties,optional:file:/opt/app/application.properties

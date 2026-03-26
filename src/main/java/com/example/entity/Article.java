@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.ToString;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.Set;
 
@@ -15,10 +15,10 @@ public class Article {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "id", columnDefinition = "this is incremental id of table", nullable = false, unique = true)
+    @Column(name = "id", nullable = false, unique = true)
     private long id;
 
-    @Column(name = "article_text", columnDefinition = "this is main text of article")
+    @Column(name = "article_text")
     private String articleText;
 
     /**

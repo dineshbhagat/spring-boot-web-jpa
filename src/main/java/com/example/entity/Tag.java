@@ -2,7 +2,7 @@ package com.example.entity;
 
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Set;
 
 @Entity
@@ -11,7 +11,7 @@ import java.util.Set;
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "tag_id", columnDefinition = "this is incremental id of table", nullable = false, unique = true)
+    @Column(name = "tag_id", nullable = false, unique = true)
     private long tagId;
 
     private String name;

@@ -1,320 +1,352 @@
-- [spring-boot-web-jpa](#spring-boot-web-jpa)
-	- [ORM to OOPs mapping](#orm-to-oops-mapping)
-		- [@ManyToMany](#manytomany)
-	- [Dockerize your application:](#dockerize-your-application)
-	- [Check Hikari configuration](#Check-hikari-configuration)
-	- [Publishing local jars](#publishing-local-jars)
+# Spring Boot Web JPA
 
-------
+A Spring Boot application demonstrating JPA/Hibernate relationships (OneToOne, OneToMany, ManyToMany), REST APIs, and Docker deployment.
 
-## spring-boot-web-jpa
----------------------------------------------------------------------------------------------------------------
+## Tech Stack
 
-Using Java-8, Spring-boot, mysql, Docker, [2-level-hibernate-cache](https://github.com/dineshbhagat/Spring-boot-JPA-Two-Level-Cache)
+| Technology | Version |
+|---|---|
+| Java | 25 |
+| Spring Boot | 4.0.5 |
+| Gradle | 9.4.1 |
+| Hibernate | 6.x (via Spring Boot) |
+| PostgreSQL | Runtime driver included |
+| H2 | In-memory (default for local dev & tests) |
+| Lombok | 1.18.38 |
+| JUnit | 5 (Jupiter) |
 
----------------------------------------------------------------------------------------------------------------
+> All dependency versions are centrally managed in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
 
-### ORM to OOPs mapping
+---
 
-ORM to OOPs mapping need understanding of the following terms:  
-Bidirectional, unidirectional, ownedBy,mappedBy, inversedBy, oneToOne, oneToMany, manyToMany, joinColumn,inverseJoinColumns, joinTable,
+## Table of Contents
 
-- Relationships may be bidirectional or unidirectional.
-- A bidirectional relationship has both an owning side and an inverse side
-- A unidirectional relationship only has an owning side.
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [ORM to OOPs Mapping](#orm-to-oops-mapping)
+  - [@OneToMany / @ManyToOne (Bidirectional)](#onetomany--manytoone-bidirectional)
+  - [@ManyToMany](#manytomany)
+- [Docker](#docker)
+  - [Build & Run with Docker](#build--run-with-docker)
+  - [Run with PostgreSQL via Docker](#run-with-postgresql-via-docker)
+  - [Docker Compose (alternative)](#docker-compose-alternative)
+- [HikariCP Connection Pool Monitoring](#hikaricp-connection-pool-monitoring)
+- [Publishing Local JARs](#publishing-local-jars)
+- [Useful Resources](#useful-resources)
 
-In bidirectional *one-to-many/many-to-one* relationship, the target side has a reference back to the source entity as well. 
+---
 
-The owning side of a `@OneToOne` association is the entity with the table containing the foreign key.
+## Quick Start
 
-The annotation `@OneToMany` is used on the side which has the collection reference(always the inverse side of a bidirectional association)  
-The annotation `@ManyToOne` is used on the side which has the single-valued back reference(always the owning side of a bidirectional association)  
-We must use `'mappedBy'` element of the `@OneToMany` annotations to specify that the corresponding table will be the parent table.  
-In other words the other side (which has `@ManyToOne`) will be the foreign-key table (child table).  
-The value of `'mappedBy'` element should be the name of the `reference variable` used in the other class's back reference.  
-The side which has `'mappedBy'` specified, will be the target entity of the relationship and corresponding table will be the parent of the relationship(has to be specified on the inversed side of a (bidirectional) association)   
-The side which doesn't have `'mappedBy'` element will be the source (owner) and the corresponding table will be the child of the relationship, i.e. it will have the foreign key column.  
-On the owner side, we can also use `@JoinColumn`, whose one of the purposes is to specify a foreign key column name instead of relying on the default name.  
-`inversedBy` has to be specified on the owning side of a (bidirectional) association.  
+### Prerequisites
 
+- **Java 25** — the Gradle [JVM Toolchain](https://docs.gradle.org/current/userguide/toolchains.html) will auto-download it if not installed locally
+- **Docker** (optional, for containerised deployments)
 
-##### @ManyToMany
+### Run locally (H2 in-memory database)
 
-1. One article can have multiple tags: e.g. java, hibernate, jpa etc.    
-   one tag can be a part of multiple Articles   
-   For Many-To-Many associations you can chose which entity is the owning and which the inverse side.  
-   There is a very simple semantic rule to decide which side is more suitable to be the owning side from a developers perspective.  
-   You only have to ask yourself, which entity is responsible for the connection management and pick that as the owning side.  
-   Take an example of two entities Article and Tag.  
-   Whenever you want to connect an Article to a Tag and vice-versa, it is mostly the Article that is responsible for this relation.  
-   Whenever you add a new article, you want to connect it with existing or new tags.  
-   Your create Article form will probably support this notion and allow to specify the tags directly.  
-   This is why you should pick the Article as owning side, as it makes the code more understandable:  
-   Annotate variables in both entity class with @ManyToMany
+```bash
+./gradlew bootRun
+```
 
-   ```java
-   @Entity
-   @Table(name = "article")
-   @Data
-   public class Article {
-      ...
-      @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Lazy loading of records
-      private Set<Tag> tags;
-      ...
-   }
-   ```
+The application starts on [http://localhost:8080](http://localhost:8080).
 
+| Endpoint | Description |
+|---|---|
+| `GET /health_check` | Returns `{"a":"Hello World!"}` |
+| `GET /actuator/health` | Spring Boot Actuator health status |
+| `GET /h2-console` | H2 database web console |
+| `POST /article` | Create an article |
+| `GET /article/{id}` | Get an article by ID |
+| `POST /user` | Create a user |
+| `GET /user/{id}` | Get a user by ID |
+| `POST /comment` | Create a comment |
+| `GET /comment/{id}` | Get a comment by ID |
 
-   ```java
-   @Entity
-   @Table(name = "tag")
-   @Data
-   public class Tag {
-      ...
-      @ManyToMany(mappedBy = "tags") // tags is instance variable in Article entity 
-      private Set<Article> articles;
-      ...
-   }
-   ```
+### Run tests
 
-2. Now to achive this we need to map relationship among Tags and Articles,  
-   So we need an extra table where we will store the relationship  
-   Let say table: `article_tag`, it has primary key of both article and tag table  
+```bash
+./gradlew clean build
+```
 
-   ```sql
-   CREATE TABLE `article_tag` (
-      `article_id` int(11) NOT NULL,
-      `tag_id` int(11) NOT NULL,
-      UNIQUE KEY `uq_article_tag` (`article_id`,`tag_id`),
-      KEY `article_id_idx` (`article_id`),
-      KEY `tag_id_idx` (`tag_id`),
-      CONSTRAINT `` FOREIGN KEY (`article_id`) REFERENCES `article` (`id`),
-      CONSTRAINT `tag_id` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tag_id`)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-   ```
+Tests run against an H2 in-memory database (configured in [`src/test/resources/application.properties`](src/test/resources/application.properties)).
 
-3. Lets use this table as joining table for two entities Tags and Article
-   So Let's annotate it with @JoinTable,  
-   but which field? `Article.tags` or `Tag.articles`  
-   To answer that we need to understand [owning side and reverse side](https://stackoverflow.com/q/2749689/2987755)
-   Since owning side is Article, Lets define `@JoinTable` on Article entity.
-   
-      ```java
-      @Entity
-      @Table(name = "article")
-      @Data
-      public class Article {
-         ...
-         @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Lazy loading of records
-         @JoinTable(
-            name = "article_tag",
-            joinColumns = {@JoinColumn(name = "article_id")},
-            inverseJoinColumns = {@JoinColumn(name = "tag_id")}
-         )
-         private Set<Tag> tags;
-         ...
-      }
-   ```
-4. But This will introduce circular dependency for Jackson when it serialize/deserialize because Article depends on tag and tag intern depends on article so we will get stackoverflow error.  
-To break this we need to ignore property from one of the entity by annotating it with `@JsonIgnore`.  
-Ths same issue will persist if application tries to print entities which intern will call ToString methods and again circular dependency so to break this we need to annotate it with `@ToString.Exclude`
+---
 
-      ```java
-      @Entity
-      @Table(name = "article")
-      @Data
-      public class Article {
-         ...
-         @JsonIgnore
-         @ToString.Exclude
-         @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Lazy loading of records
-         @JoinTable(
-            name = "article_tag",
-            joinColumns = {@JoinColumn(name = "article_id")},
-            inverseJoinColumns = {@JoinColumn(name = "tag_id")}
-         )
-         private Set<Tag> tags;
-         ...
-      }
-   ```
+## Project Structure
 
+```
+src/main/java/com/example/
+├── DemoApplication.java              # Entry point
+├── configuration/
+│   └── ApplicationConfiguration.java # RestClient & ObjectMapper beans
+├── controller/
+│   ├── ArticleCommentController.java # Article, Comment, User REST endpoints
+│   ├── MangaController.java          # Manga async/sync search
+│   └── TestController.java           # Query param demo
+├── converter/                        # Entity → DTO converters
+├── dao/                              # Spring Data JPA repositories
+├── dto/                              # Data Transfer Objects
+├── entity/
+│   ├── Article.java                  # @OneToMany ↔ Comment, @ManyToMany ↔ Tag
+│   ├── Comment.java                  # @ManyToOne → Article, @OneToOne → User
+│   ├── User.java                     # Referenced by Comment
+│   ├── Tag.java                      # @ManyToMany ↔ Article
+│   ├── Nodes.java                    # @ManyToOne → Nodetypes
+│   └── Nodetypes.java                # @OneToMany ↔ Nodes
+├── healthchecks/                     # Custom Actuator health indicator
+└── service/                          # Business logic layer
+```
 
-Ref: 
-- https://www.baeldung.com/hibernate-many-to-many  
-- https://www.logicbig.com/tutorials/java-ee-tutorial/jpa/one-to-many-bidirectional.html  
-- https://stackoverflow.com/q/12493865/2987755  
+---
 
----------------------------------------------------------------------------------------------------------------
+## ORM to OOPs Mapping
+
+Understanding JPA relationships requires these key concepts:
+
+| Concept | Meaning |
+|---|---|
+| **Unidirectional** | Only one side knows about the relationship |
+| **Bidirectional** | Both sides know about the relationship |
+| **Owning side** | The entity whose table contains the foreign key |
+| **Inverse side** | The other side; uses `mappedBy` to point back to the owning side |
+
+### @OneToMany / @ManyToOne (Bidirectional)
+
+In this project, `Article` ↔ `Comment` is a bidirectional one-to-many relationship:
+
+```
+Article (1) ──────< Comment (N)
+   │                    │
+   │ @OneToMany          │ @ManyToOne
+   │ mappedBy=            │ @JoinColumn
+   │ "articleTable"       │ name="article_id"
+```
+
+**Article.java** (inverse side — has the collection):
+```java
+@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "articleTable")
+private List<Comment> comments;
+```
+
+**Comment.java** (owning side — has the FK):
+```java
+@ManyToOne(optional = false, fetch = FetchType.LAZY)
+@JoinColumn(name = "article_id")
+private Article articleTable;
+```
+
+**Key rules:**
+- `@OneToMany` goes on the side with the collection (always the inverse side)
+- `@ManyToOne` goes on the side with the single-value reference (always the owning side)
+- `mappedBy` value = the field name in the owning entity (`"articleTable"` in `Comment`)
+- The owning side's table gets the FK column (`article_id` in the `comment` table)
+- `@JsonIgnore` + `@ToString.Exclude` on the `@OneToMany` side to break circular serialisation/toString
+
+### @ManyToMany
+
+`Article` ↔ `Tag` is a many-to-many relationship (one article can have multiple tags; one tag can span multiple articles):
+
+```
+Article (N) ──── article_tag ────(N) Tag
+                 ┌─────────────┐
+                 │ article_id  │
+                 │ tag_id      │
+                 └─────────────┘
+```
+
+**Article.java** (owning side — defines the join table):
+```java
+@JsonIgnore
+@ToString.Exclude
+@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+@JoinTable(
+    name = "article_tag",
+    joinColumns = {@JoinColumn(name = "article_id")},
+    inverseJoinColumns = {@JoinColumn(name = "tag_id")}
+)
+private Set<Tag> tags;
+```
+
+**Tag.java** (inverse side):
+```java
+@ManyToMany(mappedBy = "tags")
+private Set<Article> articles;
+```
+
+> **Why `Set` instead of `List`?** Hibernate handles `@ManyToMany` removal more efficiently with `Set`. With `List`, deleting one association causes Hibernate to delete all rows and re-insert N−1, degrading performance.
+
+**Choosing the owning side:** Pick the entity responsible for managing the connection. Since creating an article typically involves choosing its tags, `Article` is the natural owning side.
+
+---
+
+## Entity Relationship Diagram
+
 ![article-eer-diagram](https://user-images.githubusercontent.com/3823705/47979440-34a48880-e0e9-11e8-8c6c-7c7f552d7ad3.png)
 
+---
 
----------------------------------------------------------------------------------------------------------------
+## Docker
 
-#### Dockerize your application:   
+The project uses a **multi-stage Dockerfile** for small, secure production images:
 
-If your application has multiple dependencies then there are two way to dockerize whole application infra viz.  
-1. Create individual images for each components and link them together once containers are up
-2. using docker-compose
+| Stage | Base Image | Purpose |
+|---|---|---|
+| **Builder** | `eclipse-temurin:25-jdk` | Compiles source with Gradle wrapper |
+| **Runtime** | `eclipse-temurin:25-jre-alpine` | Minimal JRE-only image (~150 MB) |
 
-Let see approach 1.
+**Key features:**
+- 🔒 Runs as non-root user (`appuser`)
+- 📦 Layer caching — dependencies are downloaded before source is copied
+- 🏥 Built-in `HEALTHCHECK` via `/actuator/health`
+- 🧠 JVM respects container memory limits (`-XX:MaxRAMPercentage=75.0`)
+- ⚡ ZGC garbage collector for low-latency (`-XX:+UseZGC`)
 
-Prerequisite:
-Install following docker related software and packages
-- [Docker](https://www.docker.com/products/docker-engine)
-- [Docker-toolbox](https://docs.docker.com/toolbox/) 
+### Build & Run with Docker
 
+```bash
+# Build the image (Gradle build happens inside Docker)
+docker build -t spring-boot-web-jpa .
 
+# Run with H2 (default)
+docker run -p 8080:8080 spring-boot-web-jpa
 
-1. get mysql server image  
-`docker pull mysql:8`
-
-   check image list  
-   `docker images -a`
-
-
-2. Run mysql image ==> it means create mysql container (lets name it as spring-mysql)
-
-   `docker run --name spring-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -e MYSQL_USER=root -e MYSQL_PASSWORD=root -d mysql/mysql-server:8.0`
-
-
-   By default, when you create a container, it does not publish any of its ports to the outside world.  
-   To make a port available to services outside of Docker, or to Docker containers which are not connected to the container’s network, use the --publish or -p flag.   
-   This creates a firewall rule which maps a container port to a port on the Docker host. Here are some examples
-
-   `-p <docker-host-port>:<Docker-port>`
-   
-   `-p 8080:80/tcp -p 8080:80/udp` //Map TCP port 80 in the container to TCP port 8080 on the Docker host, and map UDP port 80 in the container to UDP port 8080 on the Docker host.  
-
-3. You should get your container in list  
-`docker ps`
-
-4. connect to mysql create DB and insert data by connecting to container via shell  
-   `docker exec -it spring-mysql bash`
-   `mysql -uroot -proot`
-
-   //execute mysql commands for DB,table creation and insert data  
-   [table.sql](src/main/resources/table.sql)
-
-5. Build your application image from Dockerfile  
-
-   Update [application.properties](src/main/resources/application.properties) file with file at [here](docker/application.properties)  
-   Difference between two file is database url
- 
-   `spring.datasource.url=jdbc:mysql://spring-mysql:3306/test`
-   here: spring-mysql is mysql container name
-
-
-   Build application  
-    `./gradlew clean build`
-
-   To create image we need to write [`Dockerfile`](Dockerfile)   
-
-
-   Create image file with name :spring-boot-web-jpa  
-     `docker build . -t spring-boot-web-jpa`
-
-   check images, should show above image  
-     `docker images`
-
-6. if there are existing images or container, stop them or delete them  
-   `docker container rm -f spring-boot-web-jpa-mysql spring-mysql && docker container list && docker image rm -f spring-boot-web-jpa && docker images`
-
-7. link mysql with spring-boot application and create container(name : spring-boot-web-jpa-mysql)  
-   `docker run -p 8080:8080 --name spring-boot-web-jpa-mysql --link spring-mysql:mysql spring-boot-web-jpa`  
-you can run in detach mode  
-   `docker run -p 8080:8080 --name spring-boot-web-jpa-mysql --link spring-mysql:mysql -d spring-boot-web-jpa`
-
-
-8. To Stop container  
-   `docker container stop <container-name or container id>`  
-
-
-
-Ref:   
-1. https://springbootdev.com/2017/11/30/docker-spring-boot-and-spring-data-jpa-mysql-rest-api-example-with-docker-without-docker-compose/  
-2. https://springbootdev.com/2018/01/09/spring-boot-rest-api-with-docker-with-docker-compose/
-
-
-
-----------------------------------------------------------------------------------------------------------------
-
-#### Check Hikari configuration
-
-If you want to identify number of connections for hikari
-1. Open application in visualVM, attach to application process and check 
-2. Log in application logs/System.out.println
-```java
-            MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-            ObjectName poolName = new ObjectName("com.zaxxer.hikari:type=Pool (HikariPool-1)");
-            HikariPoolMXBean poolProxy = JMX.newMXBeanProxy(mBeanServer, poolName, HikariPoolMXBean.class);
-
-            System.out.println("idleConnection before sleep:"+ poolProxy.getIdleConnections());
-            System.out.println("getActiveConnections before sleep:"+ poolProxy.getActiveConnections());
-            System.out.println("getIdleConnections before sleep:"+ poolProxy.getIdleConnections());
-            System.out.println("getThreadsAwaitingConnection before sleep:"+ poolProxy.getThreadsAwaitingConnection());
-            System.out.println("getTotalConnections before sleep:"+ poolProxy.getTotalConnections());
-            Thread.sleep(10000);
-            System.out.println("idleConnection after sleep:"+ poolProxy.getIdleConnections());
-            System.out.println("getActiveConnections after sleep:"+ poolProxy.getActiveConnections());
-            System.out.println("getIdleConnections after sleep:"+ poolProxy.getIdleConnections());
-            System.out.println("getThreadsAwaitingConnection after sleep:"+ poolProxy.getThreadsAwaitingConnection());
-            System.out.println("getTotalConnections after sleep:"+ poolProxy.getTotalConnections());
+# Verify
+curl http://localhost:8080/actuator/health
+# → {"status":"UP"}
 ```
 
-[Ref](https://github.com/brettwooldridge/HikariCP/wiki/MBean-(JMX)-Monitoring-and-Management)
+### Run with PostgreSQL via Docker
 
----------------------------------------------------------------------------------------------------------------
+```bash
+# 1. Start PostgreSQL
+docker run -d \
+    --name spring-postgresql \
+    -p 5432:5432 \
+    -e POSTGRES_DB=test \
+    -e POSTGRES_USER=postgres \
+    -e POSTGRES_PASSWORD=postgres \
+    postgres:17-alpine
 
-#### Publishing local jars
+# 2. (Optional) Load seed data
+docker exec -i spring-postgresql psql -U postgres -d test < src/main/resources/table.sql
 
-To publish jar locally, add following in build.gradle file and 
+# 3. Build & run the app, linking to PostgreSQL
+docker build -t spring-boot-web-jpa .
+
+docker run -p 8080:8080 \
+    --link spring-postgresql:postgresql \
+    -v $(pwd)/docker/application.properties:/opt/app/application.properties \
+    spring-boot-web-jpa
+
+# 4. Verify
+curl http://localhost:8080/health_check
+# → {"a":"Hello World!"}
+```
+
+### Docker Compose (alternative)
+
+For a simpler multi-container setup, create a `docker-compose.yml`:
+
+```yaml
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    volumes:
+      - ./docker/application.properties:/opt/app/application.properties
+    environment:
+      JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -XX:+UseZGC"
+
+volumes:
+  pgdata:
+```
+
+```bash
+docker compose up -d
+```
+
+### Useful Docker commands
+
+```bash
+# Stop and remove containers
+docker compose down
+
+# Stop individual containers
+docker container stop spring-boot-web-jpa spring-postgresql
+
+# Remove containers and images
+docker container rm -f spring-boot-web-jpa spring-postgresql
+docker image rm -f spring-boot-web-jpa
+```
+
+---
+
+## HikariCP Connection Pool Monitoring
+
+To inspect connection pool metrics at runtime, either use **VisualVM** (attach to the app process) or add the following code:
 
 ```java
-apply plugin: 'maven-publish'
-task sourcesJar(type: Jar) {
-	from sourceSets.main.allJava
-	archiveClassifier = 'sources'
-}
-task javadocJar(type: Jar) {
-    archiveClassifier = 'javadoc'
-    from javadoc.destinationDir
-}
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			version = '1.x.snapshot'
-			from components.java
-			artifact sourcesJar
-			artifact javadocJar
-		}
-	}
-}
+MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+ObjectName poolName = new ObjectName("com.zaxxer.hikari:type=Pool (HikariPool-1)");
+HikariPoolMXBean poolProxy = JMX.newMXBeanProxy(mBeanServer, poolName, HikariPoolMXBean.class);
+
+System.out.println("Active connections:  " + poolProxy.getActiveConnections());
+System.out.println("Idle connections:    " + poolProxy.getIdleConnections());
+System.out.println("Total connections:   " + poolProxy.getTotalConnections());
+System.out.println("Threads waiting:     " + poolProxy.getThreadsAwaitingConnection());
 ```
-execute following command
+
+> Enable JMX monitoring in `application.properties`:
+> ```properties
+> spring.datasource.hikari.register-mbeans=true
+> ```
+
+Reference: [HikariCP JMX Monitoring](https://github.com/brettwooldridge/HikariCP/wiki/MBean-(JMX)-Monitoring-and-Management)
+
+---
+
+## Publishing Local JARs
+
+The build includes `maven-publish` plugin. To publish to your local `.m2` repository:
 
 ```bash
 ./gradlew publishToMavenLocal
 ```
 
-To refer to localjars,   
-make sure you have added `mavenLocal` in repository url
+Artifact location: `~/.m2/repository/com/example/demo/<version>/`
 
-```java
+To consume it from another project, add `mavenLocal()` to repositories:
+
+```groovy
 repositories {
-  mavenLocal()
+    mavenLocal()
+    mavenCentral()
 }
 ```
-Artifact will be at 
-`/Users/$USER/.m2/repository/<package>/*.jar` for mac
 
-------
+---
 
+## Useful Resources
 
-[![HitCount](http://hits.dwyl.com/dineshbhagat/spring-boot-web-jpa.svg)](http://hits.dwyl.com/dineshbhagat/spring-boot-web-jpa)
-
-------
-
-Some of the useful resources and Q&A
-- https://github.com/simasch/spring-data-jpa-tests
-- [Efficiently adding to persistent collections](https://in.relation.to/2024/11/07/adding-to-collections/)
-- [CauseOfDeathSpringDataJPA](https://github.com/Persistence-Hub/Talk_CauseOfDeathSpringDataJPA/tree/main) - [Video](https://www.youtube.com/watch?v=AF9RAgGN5CM&ab_channel=SpringI%2FO)
+- [Spring Data JPA Reference](https://docs.spring.io/spring-data/jpa/reference/)
+- [Hibernate Many-to-Many — Baeldung](https://www.baeldung.com/hibernate-many-to-many)
+- [JPA OneToMany Bidirectional — LogicBig](https://www.logicbig.com/tutorials/java-ee-tutorial/jpa/one-to-many-bidirectional.html)
+- [Efficiently adding to persistent collections — Hibernate Blog](https://in.relation.to/2024/11/07/adding-to-collections/)
+- [Cause of Death: Spring Data JPA — Talk](https://github.com/Persistence-Hub/Talk_CauseOfDeathSpringDataJPA/tree/main) ([Video](https://www.youtube.com/watch?v=AF9RAgGN5CM))
+- [Spring Data JPA Tests Examples](https://github.com/simasch/spring-data-jpa-tests)
+- [Docker + Spring Boot + MySQL Tutorial](https://springbootdev.com/2017/11/30/docker-spring-boot-and-spring-data-jpa-mysql-rest-api-example-with-docker-without-docker-compose/)

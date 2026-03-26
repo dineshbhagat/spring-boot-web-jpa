@@ -1,66 +1,53 @@
-FROM alpine:3.9
-#FROM ubuntu:18.04
+# ==============================================================
+# Stage 1 — Build the application using Gradle wrapper
+# ==============================================================
+FROM eclipse-temurin:25-jdk AS builder
+
+WORKDIR /app
+
+# Copy Gradle wrapper and build config first (layer caching)
+COPY gradlew settings.gradle build.gradle ./
+COPY gradle/ gradle/
+
+# Download dependencies (cached unless build files change)
+RUN ./gradlew dependencies --no-daemon || true
+
+# Copy source code
+COPY src/ src/
+
+# Build the fat jar, skip tests (they run in CI)
+RUN ./gradlew bootJar --no-daemon -x test
+
+
+# ==============================================================
+# Stage 2 — Minimal runtime image
+# ==============================================================
+FROM eclipse-temurin:25-jre-alpine
+
 LABEL maintainer="dinesh"
 
-# following will be like
-# RUN apt-get update && apt-get install -y  openjdk-8-jre openjdk-8-jdk openjfx git maven && ca-certificates-java && apt-get clean &&
-# rm -rf /var/lib/apt/lists/* && rm -rf /var/cache/oracle-jdk8-installer;
-#RUN apt-get update && apt-get install -y \
-#    openjdk-8-jre \
-#    openjdk-8-jdk \
-##    openjfx \
-##    git \
-##    maven && \
-## Fix certificate issues, found as of
-## https://bugs.launchpad.net/ubuntu/+source/ca-certificates-java/+bug/983302
-#    ca-certificates-java && \
-#    apt-get clean && \
-#    rm -rf /var/lib/apt/lists/* && \
-#    rm -rf /var/cache/oracle-jdk8-installer;
+# Create a non-root user for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Default to UTF-8 file.encoding
-ENV LANG C.UTF-8
+WORKDIR /opt/app
 
+# Copy the built jar from the builder stage
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-#ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
-#RUN export JAVA_HOME
+# Optionally copy external config (can be overridden via volume mount)
+COPY docker/application.properties application.properties
 
-# add a simple script that can auto-detect the appropriate JAVA_HOME value
-# based on whether the JDK or only the JRE is installed
-RUN { \
-		echo '#!/bin/sh'; \
-		echo 'set -e'; \
-		echo; \
-		echo 'dirname "$(dirname "$(readlink -f "$(which javac || which java)")")"'; \
-	} > /usr/local/bin/docker-java-home \
-	&& chmod +x /usr/local/bin/docker-java-home
-ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
-ENV PATH $PATH:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin
+# Set ownership
+RUN chown -R appuser:appgroup /opt/app
 
-ENV JAVA_VERSION 8u191
-ENV JAVA_ALPINE_VERSION 8.191.12-r0
-
-RUN set -x \
-	&& apk add --no-cache \
-		openjdk8="$JAVA_ALPINE_VERSION" \
-	&& [ "$JAVA_HOME" = "$(docker-java-home)" ]
-
-
-
-RUN mkdir /opt/mydemo
-
-RUN ls /opt/
-
-ADD build/libs/* /opt/mydemo/
-ADD build/resources/main/* /opt/mydemo/
-ADD docker/* /opt/mydemo/
-
-RUN chmod 755 /opt/mydemo/
+USER appuser
 
 EXPOSE 8080
-EXPOSE 5432
 
-RUN ls /opt/mydemo/
-WORKDIR /opt/mydemo/
+# JVM tuning: respect container memory limits
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -XX:+UseZGC"
 
-ENTRYPOINT sh /opt/mydemo/run.sh
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD wget -qO- http://localhost:8080/actuator/health || exit 1
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar --spring.config.location=optional:classpath:/application.properties,optional:file:./application.properties"]

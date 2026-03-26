@@ -54,7 +54,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setStr(commentDto.getStr());
         Article article1 = article.get();
         article1.getComments().add(comment);
-//        comment.setArticle(article1);
+        comment.setArticleTable(article1);
         commentDao.save(comment);
         return comment;
     }

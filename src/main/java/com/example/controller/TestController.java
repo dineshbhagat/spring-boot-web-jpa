@@ -1,11 +1,12 @@
 package com.example.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
 Ref: https://lankydan.dev/2017/03/11/passing-data-transfer-objects-with-get-in-spring-boot
@@ -20,7 +21,7 @@ public class TestController {
         curl -X GET 'http://localhost:8080/test?deliveryMethod=2' -H 'Content-Type: application/json'
     */
     @GetMapping(value = "/test", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String test(Test test) throws JsonProcessingException {
+    public String test(Test test) throws JacksonException {
         ObjectMapper objectMapper = new ObjectMapper();
         System.out.println(objectMapper.writeValueAsString(test));
         return objectMapper.writeValueAsString(test);

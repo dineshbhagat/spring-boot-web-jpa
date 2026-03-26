@@ -4,17 +4,14 @@ import com.example.dao.ArticleDao;
 import com.example.dao.CommentDao;
 import com.example.dao.UserDao;
 import com.example.entity.Article;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Optional;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 public class JPAEntityLevelTests2 {
     @Autowired
@@ -32,7 +29,7 @@ public class JPAEntityLevelTests2 {
         Optional<Article> articleOptional = articleDao.findById(1L);
         if (articleOptional.isPresent()) {
             Article article = articleOptional.get();
-            Assert.assertEquals(1L, article.getId());
+            Assertions.assertEquals(1L, article.getId());
         }
     }
 

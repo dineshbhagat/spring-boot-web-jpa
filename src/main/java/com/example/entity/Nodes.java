@@ -1,6 +1,6 @@
 package com.example.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -8,7 +8,7 @@ import java.util.Date;
 public class Nodes { 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private int node_id;
     private String name;
