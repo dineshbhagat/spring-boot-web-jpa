@@ -17,10 +17,8 @@ public class Tag {
     private String name;
     private String description;
 
-    /**
-     * One tag can be a part of multiple articles e.g. there can be multiple articles on Java tag
-     * Note Set<Article> against List<Article>
-     */
+    /// One tag can be a part of multiple articles e.g. there can be multiple articles on Java tag.
+    /// Note `Set<Article>` against `List<Article>`.
     @ManyToMany(mappedBy = "tags")
     private Set<Article> articles;
 }

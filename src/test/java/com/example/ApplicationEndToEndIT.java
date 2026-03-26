@@ -11,54 +11,52 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.resttestclient.TestRestTemplate;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Full end-to-end integration test that boots the real application on a random
- * port and exercises every CRUD endpoint using an HTTP client — exactly the
- * same flow as manual {@code curl} verification, but fully automated.
- */
+/// Full end-to-end integration test that boots the real application on a random
+/// port and exercises every CRUD endpoint using [RestTestClient] — the
+/// recommended Spring Boot 4.x replacement for the deprecated TestRestTemplate.
+///
+/// `@AutoConfigureRestTestClient` auto-configures a [RestTestClient]
+/// bound to the running server (RANDOM_PORT), so no manual URL building is needed.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestRestTemplate
+@AutoConfigureRestTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ApplicationEndToEndIT {
 
-    @LocalServerPort
-    private int port;
-
     @Autowired
-    private TestRestTemplate rest;
+    private RestTestClient rest;
 
-    private String url(String path) {
-        return "http://localhost:" + port + path;
-    }
+    private static final ParameterizedTypeReference<Map<String, Object>> MAP_TYPE =
+            new ParameterizedTypeReference<>() {};
 
     // ───────────────────────── Health / Actuator ─────────────────────────
 
     @Test
     @Order(1)
     void healthCheckEndpointReturnsHelloWorld() {
-        ResponseEntity<Map> response = rest.getForEntity(url("/health_check"), Map.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).containsEntry("a", "Hello World!");
+        rest.get().uri("/health_check")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(MAP_TYPE)
+                .value(body -> assertThat(body).containsEntry("a", "Hello World!"));
     }
 
     @Test
     @Order(2)
     void actuatorHealthEndpointReturnsUp() {
-        ResponseEntity<Map> response = rest.getForEntity(url("/actuator/health"), Map.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).containsEntry("status", "UP");
+        rest.get().uri("/actuator/health")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(MAP_TYPE)
+                .value(body -> assertThat(body).containsEntry("status", "UP"));
     }
 
     // ───────────────────────── User CRUD ─────────────────────────
@@ -70,19 +68,27 @@ class ApplicationEndToEndIT {
         UserDto input = new UserDto();
         input.setName("Dinesh");
 
-        ResponseEntity<User> createResp = rest.postForEntity(url("/user"), input, User.class);
+        User created = rest.post().uri("/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(input)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(User.class)
+                .returnResult().getResponseBody();
 
-        assertThat(createResp.getStatusCode()).isEqualTo(HttpStatus.OK);
-        User created = createResp.getBody();
         assertThat(created).isNotNull();
         assertThat(created.getId()).isPositive();
         assertThat(created.getFullName()).isEqualTo("Dinesh");
 
         // Get
-        ResponseEntity<User> getResp = rest.getForEntity(url("/user/" + created.getId()), User.class);
-
-        assertThat(getResp.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(getResp.getBody().getFullName()).isEqualTo("Dinesh");
+        rest.get().uri("/user/" + created.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(User.class)
+                .value(user -> {
+                    assert user != null;
+                    assertThat(user.getFullName()).isEqualTo("Dinesh");
+                });
     }
 
     // ───────────────────────── Article CRUD ─────────────────────────
@@ -94,21 +100,28 @@ class ApplicationEndToEndIT {
         ArticleDto input = new ArticleDto();
         input.setArticleText("Spring Boot 4 integration test article");
 
-        ResponseEntity<Article> createResp = rest.postForEntity(url("/article"), input, Article.class);
+        Article created = rest.post().uri("/article")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(input)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Article.class)
+                .returnResult().getResponseBody();
 
-        assertThat(createResp.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Article created = createResp.getBody();
         assertThat(created).isNotNull();
         assertThat(created.getId()).isPositive();
         assertThat(created.getArticleText()).isEqualTo("Spring Boot 4 integration test article");
 
         // Get (via DTO — includes comments list)
-        ResponseEntity<ArticleDto> getResp = rest.getForEntity(url("/article/" + created.getId()), ArticleDto.class);
-
-        assertThat(getResp.getStatusCode()).isEqualTo(HttpStatus.OK);
-        ArticleDto dto = getResp.getBody();
-        assertThat(dto.getArticleText()).isEqualTo("Spring Boot 4 integration test article");
-        assertThat(dto.getComments()).isEmpty();
+        rest.get().uri("/article/" + created.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ArticleDto.class)
+                .value(dto -> {
+                    assert dto != null;
+                    assertThat(dto.getArticleText()).isEqualTo("Spring Boot 4 integration test article");
+                    assertThat(dto.getComments()).isEmpty();
+                });
     }
 
     // ───────────────────────── Comment CRUD ─────────────────────────
@@ -119,36 +132,57 @@ class ApplicationEndToEndIT {
         // Prereqs — create user + article
         UserDto userInput = new UserDto();
         userInput.setName("TestUser");
-        User user = rest.postForObject(url("/user"), userInput, User.class);
+        User user = rest.post().uri("/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userInput)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(User.class)
+                .returnResult().getResponseBody();
 
         ArticleDto articleInput = new ArticleDto();
         articleInput.setArticleText("Article for commenting");
-        Article article = rest.postForObject(url("/article"), articleInput, Article.class);
+        Article article = rest.post().uri("/article")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(articleInput)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Article.class)
+                .returnResult().getResponseBody();
 
         // Create comment
         CommentDto commentInput = new CommentDto();
         commentInput.setStr("Great article!");
+        assert user != null;
         commentInput.setUserId(user.getId());
+        assert article != null;
         commentInput.setArticleId(article.getId());
 
-        ResponseEntity<Map> createResp = rest.postForEntity(url("/comment"), commentInput, Map.class);
+        Map<String, Object> body = rest.post().uri("/comment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(commentInput)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(MAP_TYPE)
+                .returnResult().getResponseBody();
 
-        assertThat(createResp.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Map body = createResp.getBody();
         assertThat(body).containsKey("id");
         assertThat(body.get("str")).isEqualTo("Great article!");
 
         // Get comment
         Number commentId = (Number) body.get("id");
-        ResponseEntity<CommentDto> getResp = rest.getForEntity(url("/comment/" + commentId), CommentDto.class);
-
-        assertThat(getResp.getStatusCode()).isEqualTo(HttpStatus.OK);
-        CommentDto dto = getResp.getBody();
-        assertThat(dto.getStr()).isEqualTo("Great article!");
-        assertThat(dto.getUserId()).isEqualTo(user.getId());
-        assertThat(dto.getArticleId()).isEqualTo(article.getId());
-        assertThat(dto.getUser()).isNotNull();
-        assertThat(dto.getUser().getName()).isEqualTo("TestUser");
+        rest.get().uri("/comment/" + commentId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CommentDto.class)
+                .value(dto -> {
+                    assert dto != null;
+                    assertThat(dto.getStr()).isEqualTo("Great article!");
+                    assertThat(dto.getUserId()).isEqualTo(user.getId());
+                    assertThat(dto.getArticleId()).isEqualTo(article.getId());
+                    assertThat(dto.getUser()).isNotNull();
+                    assertThat(dto.getUser().getName()).isEqualTo("TestUser");
+                });
     }
 
     // ───────────────────────── Article ↔ Comment Relationship ─────────────────────────
@@ -159,36 +193,66 @@ class ApplicationEndToEndIT {
         // Create two separate users (comment.user_id has a UNIQUE constraint)
         UserDto userInput1 = new UserDto();
         userInput1.setName("RelationUser1");
-        User user1 = rest.postForObject(url("/user"), userInput1, User.class);
+        User user1 = rest.post().uri("/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userInput1)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(User.class)
+                .returnResult().getResponseBody();
 
         UserDto userInput2 = new UserDto();
         userInput2.setName("RelationUser2");
-        User user2 = rest.postForObject(url("/user"), userInput2, User.class);
+        User user2 = rest.post().uri("/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userInput2)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(User.class)
+                .returnResult().getResponseBody();
 
         ArticleDto articleInput = new ArticleDto();
         articleInput.setArticleText("Article with multiple comments");
-        Article article = rest.postForObject(url("/article"), articleInput, Article.class);
+        Article article = rest.post().uri("/article")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(articleInput)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Article.class)
+                .returnResult().getResponseBody();
 
         CommentDto c1 = new CommentDto();
         c1.setStr("First comment");
+        assert user1 != null;
         c1.setUserId(user1.getId());
+        assert article != null;
         c1.setArticleId(article.getId());
-        rest.postForObject(url("/comment"), c1, Map.class);
+        rest.post().uri("/comment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(c1)
+                .exchangeSuccessfully();
 
         CommentDto c2 = new CommentDto();
         c2.setStr("Second comment");
+        assert user2 != null;
         c2.setUserId(user2.getId());
         c2.setArticleId(article.getId());
-        rest.postForObject(url("/comment"), c2, Map.class);
+        rest.post().uri("/comment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(c2)
+                .exchangeSuccessfully();
 
         // Fetch article — comments should be included
-        ResponseEntity<ArticleDto> resp = rest.getForEntity(url("/article/" + article.getId()), ArticleDto.class);
-
-        assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.OK);
-        ArticleDto dto = resp.getBody();
-        assertThat(dto.getComments()).hasSize(2);
-        assertThat(dto.getComments())
-                .extracting(CommentDto::getStr)
-                .containsExactlyInAnyOrder("First comment", "Second comment");
+        rest.get().uri("/article/" + article.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ArticleDto.class)
+                .value(dto -> {
+                    assert dto != null;
+                    assertThat(dto.getComments()).hasSize(2);
+                    assertThat(dto.getComments())
+                            .extracting(CommentDto::getStr)
+                            .containsExactlyInAnyOrder("First comment", "Second comment");
+                });
     }
 }

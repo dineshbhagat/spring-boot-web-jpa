@@ -19,10 +19,8 @@ public class OrgViews {
     // if we make all views as class, then we can not extends multiple classes as following
     public interface Personal extends Internal, Health, HR {}
 
-    /**
-     * This enum is used to get/store respective ObjectReader, ObjectWriter, also controls which all
-     * view types are allowed for rendering
-     */
+    /// This enum is used to get/store respective `ObjectReader`, `ObjectWriter`, also controls which all
+    /// view types are allowed for rendering.
     enum Views {
         PUBLIC, INTERNAL, PERSONAL
     }

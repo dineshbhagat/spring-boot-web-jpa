@@ -27,14 +27,13 @@ public class Comment implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    /**
-     * We do not make it mandatory, comment still exists even if post is not present
-     *
-     * @JoinColumn says that Comment table will contain a separate column article_id
-     * which will eventually act as a foreign key reference to primary key of Article table
-     * @ManyToOne says that multiple Comment tuples can refer to same Article Tuples(Multiple Comment can be in same Article)
-     * Additionally , with optional=false we make sure that no Comment tuple can exist without a Article tuple.
-     */
+    /// We do not make it mandatory, comment still exists even if post is not present.
+    ///
+    /// `@JoinColumn` says that Comment table will contain a separate column `article_id`
+    /// which will eventually act as a foreign key reference to primary key of Article table.
+    ///
+    /// `@ManyToOne` says that multiple Comment tuples can refer to same Article tuples (multiple Comments can be in same Article).
+    /// Additionally, with `optional=false` we make sure that no Comment tuple can exist without an Article tuple.
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     private Article articleTable;

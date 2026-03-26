@@ -43,13 +43,9 @@ dependencies {
     // Utilities
     implementation libs.guava
 
-    // Spring Boot Admin — commented out until a Spring Boot 4.x compatible version is released
-    // implementation libs.spring.boot.admin.starter.server
-
     // Test
     testImplementation libs.spring.boot.starter.test
     testImplementation libs.spring.boot.webmvc.test
-    testImplementation libs.spring.boot.restclient.test
     testImplementation libs.spring.boot.resttestclient
 }
 

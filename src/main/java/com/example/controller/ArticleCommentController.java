@@ -47,12 +47,10 @@ public class ArticleCommentController {
         return map;
     }
 
-    /**
-     * ideally you should not return article's id as response"
-     *
-     * @param articleDto
-     * @return
-     */
+    /// Ideally you should not return article's id as response.
+    ///
+    /// @param articleDto the article data transfer object
+    /// @return the created article
     @RequestMapping(value = "/article", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public Article addArticle(@RequestBody ArticleDto articleDto) {
         return articleService.addArticle(articleDto);

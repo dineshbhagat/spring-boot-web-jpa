@@ -5,9 +5,7 @@ import java.util.function.Supplier;
 
 public class HighOrderFunction {
 
-    /**
-        This function takes function as argument and return high order composite function to the caller
-     */
+    /// This function takes function as argument and return high order composite function to the caller
     public static Supplier<String> transformAndConcat(final String str1,final String str2, Function<String, String> transform) {
 
         return () -> {

@@ -7,10 +7,8 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 
-/**
- * Ref:https://www.baeldung.com/jackson-json-view-annotation,
- * https://stackoverflow.com/q/38279782/2987755
- */
+/// Ref: <https://www.baeldung.com/jackson-json-view-annotation>,
+/// <https://stackoverflow.com/q/38279782/2987755>
 public class OrgViewsClient {
 
     public static final ObjectMapper objectMapper = JsonMapper.builder()

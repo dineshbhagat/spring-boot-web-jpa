@@ -8,18 +8,17 @@ import lombok.Data;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-/**
-Ref: https://lankydan.dev/2017/03/11/passing-data-transfer-objects-with-get-in-spring-boot
-*/
+/// Ref: <https://lankydan.dev/2017/03/11/passing-data-transfer-objects-with-get-in-spring-boot>
 @RestController
 public class TestController {
 
-    /**
-        When you have multiple queryParam, you can have one of the implementation as below.
-        curl -X GET 'http://localhost:8080/test?s=a&deliveryMethod=2' -H 'Content-Type: application/json'
-        or
-        curl -X GET 'http://localhost:8080/test?deliveryMethod=2' -H 'Content-Type: application/json'
-    */
+    /// When you have multiple queryParam, you can have one of the implementation as below.
+    ///
+    ///     curl -X GET 'http://localhost:8080/test?s=a&deliveryMethod=2' -H 'Content-Type: application/json'
+    ///
+    /// or
+    ///
+    ///     curl -X GET 'http://localhost:8080/test?deliveryMethod=2' -H 'Content-Type: application/json'
     @GetMapping(value = "/test", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public String test(Test test) throws JacksonException {
         ObjectMapper objectMapper = new ObjectMapper();

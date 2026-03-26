@@ -18,10 +18,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     private ArticleDao articleDao;
 
-    /**
-     * No need for autowire if you are adding as constructor dependency
-     * @param articleDao
-     */
+    /// No need for autowire if you are adding as constructor dependency.
+    ///
+    /// @param articleDao the article data access object
     public ArticleServiceImpl(ArticleDao articleDao) {
         this.articleDao = articleDao;
     }
