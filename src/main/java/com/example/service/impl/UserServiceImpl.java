@@ -5,10 +5,12 @@ import com.example.dto.UserDto;
 import com.example.entity.User;
 import com.example.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service("UserService")
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private UserDao userDao;
@@ -18,6 +20,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User addUser(UserDto userDto) {
         User user = new User();
         user.setFullName(userDto.getName());

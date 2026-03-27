@@ -10,11 +10,13 @@ import com.example.entity.User;
 import com.example.service.CommentService;
 import com.google.common.base.Strings;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Optional;
 
 @Service("CommentService")
+@Transactional(readOnly = true)
 public class CommentServiceImpl implements CommentService {
 
     private CommentDao commentDao;
@@ -30,6 +32,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public Comment addComment(CommentDto commentDto) {
         if (commentDto == null ||
                 Strings.isNullOrEmpty(commentDto.getStr())) {

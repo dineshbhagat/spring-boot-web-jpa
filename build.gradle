@@ -33,12 +33,13 @@ dependencies {
     // Lombok — compile-time only + annotation processor for both main and test
     compileOnly libs.lombok
     annotationProcessor libs.lombok
+    annotationProcessor libs.spring.boot.configuration.processor
     testCompileOnly libs.lombok
     testAnnotationProcessor libs.lombok
 
     // Databases
-    implementation libs.h2
     runtimeOnly libs.postgresql
+    testImplementation libs.h2
 
     // Utilities
     implementation libs.guava

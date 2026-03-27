@@ -6,6 +6,7 @@ import com.example.dto.ArticleDto;
 import com.example.entity.Article;
 import com.example.service.ArticleService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Service("ArticleService")
+@Transactional(readOnly = true)
 public class ArticleServiceImpl implements ArticleService {
 
     private ArticleDao articleDao;
@@ -26,6 +28,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Transactional
     public Article addArticle(ArticleDto articleDto) {
         Article article = new Article();
         article.setArticleText(articleDto.getArticleText());

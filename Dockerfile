@@ -1,7 +1,7 @@
 # ==============================================================
 # Stage 1 — Build the application using Gradle wrapper
 # ==============================================================
-FROM eclipse-temurin:25-jdk AS builder
+FROM eclipse-temurin:25-jdk@sha256:8e17df130e8d767ecc5241fe9a78aa489bfddab8c39a91e31f235159413325ff AS builder
 
 WORKDIR /app
 
@@ -22,7 +22,7 @@ RUN ./gradlew bootJar --no-daemon -x test
 # ==============================================================
 # Stage 2 — Minimal runtime image
 # ==============================================================
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:25-jre-alpine@sha256:0611ca158a2497b7ed6c2594a06fe88aa234401af0a43495f084ba1e986eba50
 
 LABEL maintainer="dinesh"
 

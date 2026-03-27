@@ -13,7 +13,7 @@ public class ArticleConverter {
         ArticleDto articleDto = new ArticleDto();
         articleDto.setArticleText(article.getArticleText());
         articleDto.setId(article.getId());
-        articleDto.setComments(article.getComments().parallelStream().map(CommentConverter::getDto).collect(Collectors.toList()));
+        articleDto.setComments(article.getComments().stream().map(CommentConverter::getDto).collect(Collectors.toList()));
         return articleDto;
     }
 }
