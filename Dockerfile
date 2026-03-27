@@ -18,7 +18,7 @@ COPY src/ src/
 # Build the fat jar, skip tests (they run in CI)
 RUN ./gradlew bootJar --no-daemon -x test
 
-
+***REDACTED***
 # ==============================================================
 # Stage 2 — Minimal runtime image
 # ==============================================================
@@ -35,7 +35,7 @@ WORKDIR /opt/app
 COPY --from=builder /app/build/libs/*.jar app.jar
 
 # Optionally copy external config (can be overridden via volume mount)
-COPY docker/application.properties application.properties
+COPY src/main/resources/application.properties application.properties
 
 # Set ownership
 RUN chown -R appuser:appgroup /opt/app
