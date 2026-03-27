@@ -18,7 +18,6 @@ COPY src/ src/
 # Build the fat jar, skip tests (they run in CI)
 RUN ./gradlew bootJar --no-daemon -x test
 
-***REDACTED***
 # ==============================================================
 # Stage 2 — Minimal runtime image
 # ==============================================================
