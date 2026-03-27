@@ -1,19 +1,19 @@
-# Spring Boot Web JPA
+# Spring Boot Web JPA, [![HitCount](http://hits.dwyl.com/dineshbhagat/spring-boot-web-jpa.svg)](http://hits.dwyl.com/dineshbhagat/spring-boot-web-jpa)
 
 A Spring Boot application demonstrating JPA/Hibernate relationships (OneToOne, OneToMany, ManyToMany), REST APIs, and Docker deployment.
 
 ## Tech Stack
 
-| Technology | Version |
-|---|---|
-| Java | 25 |
-| Spring Boot | 4.0.5 |
-| Gradle | 9.4.1 |
-| Hibernate | 6.x (via Spring Boot) |
-| PostgreSQL | Runtime driver included |
-| H2 | In-memory (default for local dev & tests) |
-| Lombok | 1.18.38 |
-| JUnit | 5 (Jupiter) |
+| Technology  | Version                                   |
+|-------------|-------------------------------------------|
+| Java        | 25                                        |
+| Spring Boot | 4.0.5                                     |
+| Gradle      | 9.4.1                                     |
+| Hibernate   | 6.x (via Spring Boot)                     |
+| PostgreSQL  | Runtime driver included                   |
+| H2          | In-memory (default for local dev & tests) |
+| Lombok      | 1.18.38                                   |
+| JUnit       | 5 (Jupiter)                               |
 
 > All dependency versions are centrally managed in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
 
