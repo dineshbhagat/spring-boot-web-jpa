@@ -50,7 +50,7 @@ dependencies {
     testImplementation libs.spring.boot.resttestclient
 }
 
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform()
 }
 
@@ -62,7 +62,7 @@ tasks.withType(JavaCompile).configureEach {
 // ===============================
 // = Publishing
 // Publish locally:  ./gradlew publishToMavenLocal
-// Artifact at:      ~/.m2/repository/com/example/demo/<version>/
+// Artifact at:      ~/.m2/repository/com/example/spring-boot-web-jpa/<version>/
 // ===============================
 publishing {
     publications {
