@@ -1,4 +1,7 @@
-# Spring Boot Web JPA, [![HitCount](http://hits.dwyl.com/dineshbhagat/spring-boot-web-jpa.svg)](http://hits.dwyl.com/dineshbhagat/spring-boot-web-jpa)
+# Spring Boot Web JPA, 
+
+[![HitCount](https://hits.dwyl.com/dineshbhagat/spring-boot-web-jpa.svg?style=flat-square&show=unique)](http://hits.dwyl.com/dineshbhagat/spring-boot-web-jpa)
+
 
 A Spring Boot application demonstrating JPA/Hibernate relationships (OneToOne, OneToMany, ManyToMany), REST APIs, and Docker deployment.
 
